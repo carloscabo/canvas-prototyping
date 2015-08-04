@@ -1,8 +1,10 @@
-canvas-prototypes
+Canvas-prototypes
 =================
-WIP Canvas experiments
+WIP Canvas experiments. Most of them are WIP sketches may be non-functional or glitchy.
+If you want to start a new fast proto easiest way it's duplicate the `00-base` folder and uptade the paths.
+Have fun ;)
 
-requires
+Requires
 ========
 
 `jquery`
@@ -16,12 +18,7 @@ requires
 `utilz`
 <https://github.com/carloscabo/utilz>
 
-base demo
-=========
-
-I use as base the `00_base`, wich I duplicate for starting a new fast proto.
-
-usage
+Usage
 =====
 
-Start a web server (node http-server, PHP, etc.) ;)
+Start a web server in the root folder, all paths are relative to root (node http-server, PHP, etc.) ;)
