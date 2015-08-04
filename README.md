@@ -1,6 +1,6 @@
-canvas-proto-seaweed
-====================
-WIP Canvas experiment
+canvas-prototypes
+=================
+WIP Canvas experiments
 
 requires
 ========
@@ -16,8 +16,10 @@ requires
 `utilz`
 <https://github.com/carloscabo/utilz>
 
-The main app is:
-`canvas_seaweed.js`
+base demo
+=========
+
+I use as base the `00_base`, wich I duplicate for starting a new fast proto.
 
 usage
 =====
