@@ -1,5 +1,6 @@
 'use strict';
 
+/* Global vars for fast sketching */
 var
   cz1,
   horizon = {},
@@ -394,7 +395,7 @@ function floatAllTriangles() {
             horizon.focus0.y
           );
           tri.col = palette[utilz.randomInt(0, 2)];
-          horizon.lines[i].visible[j] = false;
+          horizon.lines[i].visible[j] = true;
           floating_triangles.push(tri);
 
         }
