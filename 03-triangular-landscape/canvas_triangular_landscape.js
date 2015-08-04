@@ -4,10 +4,7 @@ var
   cz1,
   horizon = {},
   timer_initial = 0,
-  timer_now     = 0,
   timer_last    = 0,
-  col_near = 100,
-  col_far  = 20,
   floating_triangles = [],
   palette;
 
