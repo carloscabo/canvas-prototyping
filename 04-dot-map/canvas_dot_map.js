@@ -17,6 +17,7 @@ var gV = {
 },
 cz1,
 matrix,
+matrix_copy,
 ripple = null;
 
 function Dot () {
@@ -31,7 +32,7 @@ function Ripple (cx, cy, duration) {
   this.cy = cy;
   this.init_time =  Date.now();
   this.duration = 2000;
-  this.radius = 200;
+  this.radius = 150;
 }
 
 function Matrix(cols, rows) {
@@ -116,6 +117,8 @@ $(document).ready(function() {
   }
 
   function matrixReady() {
+    // matrix_copy = matrix.slice();
+    // console.log(matrix_copy);
     cz1.start();
   }
 
@@ -127,8 +130,8 @@ $(document).ready(function() {
 
   // HSL
   var palette = [
-    [216,216,216], // Gris claro
-    [200,200,200], // Gris medio
+    [200,200,200], // Gris claro
+    [190,190,190], // Gris medio
     [185,193, 23]  // Verde gonico
   ];
 
@@ -151,20 +154,6 @@ $(document).ready(function() {
 
   cz1.draw = function() {
 
-    // Dibuja el mapa
-    for(var i = 0; i < matrix.length; i++) {
-      for(var j = 0; j < matrix[j].length; j++) {
-        // console.log(matrix[i][j]);
-        var dot = matrix[i][j];
-        var x = gV.map.offset_x + (dot.x * gV.map.w);
-        var y = gV.map.offset_y + (dot.y * gV.map.h);
-        // console.log('rgba('+palette[dot.color].join(',')+')');
-        cz1.fS = 'rgb('+palette[dot.color].join(',')+')';
-        cz1.plot( x, y, gV.dots.radius * dot.size);
-        // console.log(dot.size);
-      }
-    }
-
     // Dibuja el ripple
     if (ripple) {
       cz1.lW = 2;
@@ -174,15 +163,58 @@ $(document).ready(function() {
       if (ease > 1) {
         ripple = null;
       } else {
-        cz1.sS = 'rgba(238,0,0,'+((1-ease)*1)+')';
+        // Radio del ripple actual
+        var rr = ease * ripple.radius;
+        // console.log(rr);
+        // Fuerza del ripple, mas debil cuanto más lejos float [0 -1]
+        var rs = (1-ease)*1;
+
+        // Draw ripple circle
+        /*cz1.sS = 'rgba(238,0,0,'+rs+')';
         cz1.circle(
           ripple.cx,
           ripple.cy,
-         (ease * ripple.radius)
-        );
+          rr
+        );*/
       }
     }
 
+    // Dibuja el mapa
+    for(var i = 0; i < matrix.length; i++) {
+      for(var j = 0; j < matrix[j].length; j++) {
+        // console.log(matrix[i][j]);
+        var dot = matrix[i][j];
+        var x = gV.map.offset_x + (dot.x * gV.map.w);
+        var y = gV.map.offset_y + (dot.y * gV.map.h);
+        var dr = 1;
+        var scale = 0;
+
+        cz1.fS = 'rgb('+palette[dot.color].join(',')+')';
+
+        // Hay ripple activo?
+        if (ripple) {
+          // Distancia al centro del ripple
+          var dc = utilz.dist(x, y, ripple.cx, ripple.cy);
+          if (dc < ripple.radius) {
+            // cz1.fS = '#ee0000';
+
+            if (Math.abs(rr-dc) < 20) {
+              dr = 1-(Math.abs(rr-dc)/20); // Float [0-1]
+              scale = gV.dots.radius * dot.size * dr * rs * 1.5;
+              y = y - scale * 2;
+              x = x + scale;
+              // var r = parseInt(utilz.lerp(palette[dot.color][0], palette[2][0], dr), 10);
+              // var g = parseInt(utilz.lerp(palette[dot.color][1], palette[2][1], dr), 10);
+              // var b = parseInt(utilz.lerp(palette[dot.color][2], palette[2][2], dr), 10);
+              // cz1.fS = 'rgb('+r+','+g+','+b+')';
+            }
+
+          }
+        }
+        cz1.plot( x, y, gV.dots.radius * dot.size + scale);
+
+      } // for j
+    } // for i
 
   };
 
