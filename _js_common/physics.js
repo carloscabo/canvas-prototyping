@@ -2,17 +2,17 @@
  * Physics
  * A requirified port of Traer Physics from Processing to JavaScript.
  * Copyright (C) 2012 jonobr1
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,7 +25,7 @@ common = (function () {
 
   /**
    * Pulled only what's needed from:
-   * 
+   *
    * Underscore.js 1.3.3
    * (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
    * http://documentcloud.github.com/underscore
@@ -425,7 +425,7 @@ root.Physics = Physics = (function (ParticleSystem, raf, _) {
    * @author Jeffrey Traer Bernstein <jeff TA traer TOD cc> (original Java library)
    * @author Adam Saponara <saponara TA gmail TOD com> (JavaScript port)
    * @author Jono Brandel <http://jonobr1.com/> (requirified/optimization port)
-   * 
+   *
    * @version 0.3
    * @date March 25, 2012
    */
@@ -488,7 +488,7 @@ root.Physics = Physics = (function (ParticleSystem, raf, _) {
 
     /**
      * Set whether to optimize the simulation. This enables the check of whether
-     * particles are moving. 
+     * particles are moving.
      */
     optimize: function(b) {
       this.__optimized = !!b;
@@ -919,7 +919,7 @@ Integrator = (function (Vector, _) {
   /**
    * Runge Kutta Integrator
    * http://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods
-   * 
+   *
    * @class
    */
   var Integrator = function(s) {

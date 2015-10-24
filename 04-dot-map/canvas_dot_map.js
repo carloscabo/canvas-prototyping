@@ -16,13 +16,22 @@ var gV = {
   }
 },
 cz1,
-matrix;
+matrix,
+ripple = null;
 
 function Dot () {
   this.x = 0;
   this.y = 0;
   this.size = 0.1;
   this.color = 0;
+}
+
+function Ripple (cx, cy, duration) {
+  this.cx = cx;
+  this.cy = cy;
+  this.init_time =  Date.now();
+  this.duration = 2000;
+  this.radius = 200;
 }
 
 function Matrix(cols, rows) {
@@ -141,9 +150,8 @@ $(document).ready(function() {
   };
 
   cz1.draw = function() {
-    // cz1.sS = '#666';
-    cz1.plot(gV.cx, gV.cy, gV.radius);
 
+    // Dibuja el mapa
     for(var i = 0; i < matrix.length; i++) {
       for(var j = 0; j < matrix[j].length; j++) {
         // console.log(matrix[i][j]);
@@ -156,9 +164,35 @@ $(document).ready(function() {
         // console.log(dot.size);
       }
     }
+
+    // Dibuja el ripple
+    if (ripple) {
+      cz1.lW = 2;
+      var now = Date.now();
+      var t = (Date.now() - ripple.init_time) / ripple.duration;
+      var ease = EasingFunctions.easeOutCubic(t);
+      if (ease > 1) {
+        ripple = null;
+      } else {
+        cz1.sS = 'rgba(238,0,0,'+((1-ease)*1)+')';
+        cz1.circle(
+          ripple.cx,
+          ripple.cy,
+         (ease * ripple.radius)
+        );
+      }
+    }
+
+
   };
 
-
+  $(document).on('click', function(e) {
+    e.preventDefault();
+    ripple = new Ripple(
+      gV.cx,
+      gV.cy
+    );
+  });
 
 });
 
