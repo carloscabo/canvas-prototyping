@@ -17,7 +17,6 @@ var gV = {
 },
 cz1,
 matrix,
-matrix_copy,
 ripple = null;
 
 function Dot () {
@@ -216,7 +215,20 @@ $(document).ready(function() {
       } // for j
     } // for i
 
-  };
+    // Comienza onda en zona 'verde'
+    if(!ripple) {
+      do {
+        var px = utilz.randomInt(0, matrix.length-1);
+        var py = utilz.randomInt(0, matrix[0].length-1);
+      } while (matrix[px][py].color !== 2);
+
+      ripple = new Ripple(
+        gV.map.offset_x + (matrix[px][py].x * gV.map.w),
+        gV.map.offset_y + (matrix[px][py].y * gV.map.h)
+      );
+    }
+
+  }; // Draw
 
   $(document).on('click', function(e) {
     e.preventDefault();
