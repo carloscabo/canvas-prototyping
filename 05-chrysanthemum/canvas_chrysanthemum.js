@@ -9,27 +9,11 @@ var gV = {
 },
 cz1;
 
-function rotate(cx, cy, x, y, deg) {
-  var radians = (Math.PI / 180) * deg,
-    cos = Math.cos(radians),
-    sin = Math.sin(radians),
-    nx = (cos * (x - cx)) + (sin * (y - cy)) + cx,
-    ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
-  return [nx, ny];
-}
-
 $(document).ready(function() {
   // La magia aquí!
 
   // Inicializamos el canvas
   cz1 = new Canvaz('#cnvz');
-
-  // HSL
-  var palette = [
-    [322, 35, 59], // [3, 91, 68],  // Rojo [248,108,101],
-    [351, 46, 67], // [121, 35, 55],// Verde [98,180,99],
-    [54, 100, 47]  // [43, 79, 59]  // Amarillo [233,187,68]
-  ];
 
   cz1.drawOnce = function() {
     cz1.sS = '#666';
@@ -41,7 +25,7 @@ $(document).ready(function() {
       radius_current = radius,
       deep = 14,
       segments_all = new Array(),
-      final_angle = 60; // 1/6 circunference
+      final_angle = Math.PI / 3; // 1/6 circunference
 
     cz1.plot(0, 0, 2);
 
@@ -60,7 +44,7 @@ $(document).ready(function() {
       for (var j = 0; j < i; j++) {
         var angle = (final_angle / i) * j;
         var py = f * radius;
-        var point = rotate(0, 0, 0, py, angle);
+        var point = utilz.rotatePoint(0, 0, 0, py, angle);
         if (point[1] !== 0) {
           circle.push(point);
         }
@@ -81,8 +65,7 @@ $(document).ready(function() {
     //
     // Draw
     //
-    //
-    // console.log(circle_radius);
+
     cz1.lW = 1.1;
 
     var grd_fondo = cz1.ctx.createRadialGradient(
@@ -100,7 +83,7 @@ $(document).ready(function() {
     cz1.circle(0, 0, Math.abs(radius-4));
 
     // cz1.ctx.globalCompositeOperation = 'screen';
-    cz1.ctx.globalCompositeOperation = 'lighten';
+    // cz1.ctx.globalCompositeOperation = 'lighten';
 
 
       for (var i = circles.length - 1; i >= 0; i--) {
@@ -108,7 +91,7 @@ $(document).ready(function() {
 
         for (var k = 0; k < 6; k++) {
 
-          cz1.ctx.rotate(Math.PI / 3);
+          cz1.ctx.rotate(final_angle);
           var line_alpha = 1 - (i / deep);
           console.log(1 - (i / deep));
 
@@ -120,12 +103,12 @@ $(document).ready(function() {
               circles[i][j][0],
               circles[i][j][1],
               circle_radius[i-1]);
-            grd.addColorStop(0,"#242424");
-            grd.addColorStop(1,"#323232");
+            grd.addColorStop(0,"#000000");
+            grd.addColorStop(1,"#202020");
             cz1.fS = grd;
             cz1.sS = "#999";
             cz1.sS = "rgba(220,220,220,"+line_alpha+")";
-            cz1.ctx.globalCompositeOperation = 'lighten';
+            cz1.ctx.globalCompositeOperation = 'screen';
             cz1.circle(circles[i][j][0], circles[i][j][1], circle_radius[i-1]);
             cz1.plot(circles[i][j][0], circles[i][j][1], circle_radius[i-1]);
           };

@@ -4,6 +4,7 @@
 * HTML5 / Canvas projects.
 *
 * by Carlos Cabo 2015 http://carloscabo.com
+* v.1.01
 *
 * Some formulas borrowed from Processing.js, wikipedia or other authors
 */
@@ -32,9 +33,6 @@ utilz.getUrlVars = function () {
  * Combines 2 integer numbers in a new integer. Can be reversed
  * var newNumber = utilz.cantorPair(123,789);
  * var originalNumbers = utilz.reverseCantorPair(newNumber);
- * @param  {[type]} x Integer number
- * @param  {[type]} y Integer number
- * @return {[type]}   Resulting integer
  */
 utilz.cantorPair = function(x, y) {
   var z = ((x + y) * (x + y + 1)) / 2 + y;
@@ -53,8 +51,6 @@ utilz.reverseCantorPair = function(z) {
 
 /**
  * Radians to Degrees and back
- * @param  {[type]} rad [description]
- * @return {[type]}     [description]
  */
 utilz.radToDeg = function (rad) {
   return rad * (180 / Math.PI);
@@ -78,10 +74,6 @@ utilz.fixDeg = function(angle) {
  * first point, 0.5 is half-way in between, etc.
  * The lerp function is convenient for creating motion along a
  * straight path and for drawing dotted lines.
- * @param  {[type]} value1 [description]
- * @param  {[type]} value2 [description]
- * @param  {[type]} amt    [description]
- * @return {[type]}        [description]
  */
 utilz.lerp = function(value1, value2, amt) {
   return value1 + (value2 - value1) * amt;
@@ -96,10 +88,6 @@ utilz.lineLerp = function(x1, y1, x2, y2, amt) {
 
 /**
  * Interpolates between 2 angles, from 0 to 360 degrees.
- * @param  {[type]} ang1    [description]
- * @param  {[type]} ang2    [description]
- * @param  {[type]} percent [description]
- * @return {[type]}         [description]
  */
 utilz.angleLerp = function (ang1, ang2, percent) {
   var ret;
@@ -125,8 +113,7 @@ utilz.angleLerpAlt = function (ang1, ang2, percent) {
   return matz.radToDeg(matz.lerp(rad1, rad2, percent));
 };
 
-// Interpolate HSL color
-
+// Interpolates HSL color
 utilz.hslLerp = function(hsl1, hsl2, percent) {
   var
     h1 = hsl1[0],
@@ -145,21 +132,19 @@ utilz.hslLerp = function(hsl1, hsl2, percent) {
   return result;
 }
 
+//
 // Normalization utils
+//
 
 /**
  * Normalizes a number from another range into a value between 0 and 1.
- * @param  {[type]} aNumber [description]
- * @param  {[type]} low     [description]
- * @param  {[type]} high    [description]
- * @return {[type]}         [description]
  */
 utilz.norm = function (aNumber, low, high) {
     return (aNumber - low) / (high - low);
 };
 utilz.norm01 = utilz.norm; // Alias for the function
 
-// Inverse normaliztion between 1 and 0
+// Inverse normalization between 1 and 0
 utilz.norm10 = function (aNumber, low, high) {
     return Math.abs(((aNumber - low) / (high - low))-1);
 };
@@ -174,18 +159,17 @@ utilz.norm010 = function (aNumber, low, high) {
 
 /**
  * Re-maps a number from one range to another. In the example above,
- * the number '25' is converted from a value in the range 0..100 into a value that ranges from
- * the left edge (0) to the right edge (width) of the screen.
- * @param  {[type]} value  [description]
- * @param  {[type]} origin_min [description]
- * @param  {[type]} origin_max [description]
- * @param  {[type]} dest_min   [description]
- * @param  {[type]} dest_max   [description]
- * @return {[type]}            Resulting value
+ * the number '25' is converted from a value in the range 0..100 into
+ * a value that ranges from the left edge (0) to the right edge (width)
+ * of the screen.
  */
 utilz.map = function (value, origin_min, origin_max, dest_min, dest_max) {
   return dest_min + (dest_max - dest_min) * ((value - origin_min) / (origin_max- origin_min));
 };
+
+//
+// Points and angles
+//
 
 /**
  * Calculates the distance between two points. (2D / 3D)
@@ -208,15 +192,23 @@ utilz.dist = function() {
 
 /**
  * Returns angle in radians between 2 points
- * @param  {[type]} x1 [description]
- * @param  {[type]} y1 [description]
- * @param  {[type]} x2 [description]
- * @param  {[type]} y2 [description]
- * @return {[type]}    [description]
  */
 utilz.angleTo = function angleTo(x1, y1, x2, y2) {
   return Math.atan2( y2-y1, x2-x1 );
 };
+
+/**
+ * Rotates a point px, py from a pivot (center) in cx, cy
+ * Rotation must be in radians
+ */
+utilz.rotatePoint = function(cx, cy, px, py, rad) {
+  var
+    cos = Math.cos(rad),
+    sin = Math.sin(rad),
+    nx = (cos * (px - cx)) + (sin * (py - cy)) + cx,
+    ny = (cos * (py - cy)) - (sin * (px - cx)) + cy;
+  return [nx, ny];
+}
 
 // Duplicates an object
 utilz.cloneObject = function(source) {
