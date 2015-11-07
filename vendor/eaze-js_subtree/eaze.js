@@ -31,7 +31,7 @@ eaze = {
       return 1*t*t*((overshoot+1)*t-overshoot);
     },
     bounce: function (t) { return 1-eaze.out.bounce(1-t); },
-    elastic: function (t, amplitude, period){
+    elastic: function (t, amplitude, period) {
       var offset;
       // escape early for 0 and 1
       if (t === 0 || t === 1) { return t; }
@@ -45,6 +45,7 @@ eaze = {
       t=t-1;
       return -(amplitude*Math.pow(2,10*t)*Math.sin(((t-offset)*(Math.PI*2))/period));
     },
+  },
   // OUT => Decelerating to zero velocity
   out: {
     quad:  function (t) { return t*(2-t); },
@@ -110,7 +111,7 @@ eaze = {
       }
       return eaze.out.bounce(t*2-1)*0.5+1* 0.5;
     },
-    elastic: function (t, amplitude, period){
+    elastic: function (t, amplitude, period) {
       var offset;
       t = (t/2)-1;
       // escape early for 0 and 1

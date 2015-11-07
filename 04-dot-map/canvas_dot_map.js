@@ -158,7 +158,7 @@ $(document).ready(function() {
       cz1.lW = 2;
       var now = Date.now();
       var t = (Date.now() - ripple.init_time) / ripple.duration;
-      var ease = EasingFunctions.easeOutCubic(t);
+      var ease = eaze.out.cubic(t);
       if (ease > 1) {
         ripple = null;
       } else {
@@ -195,7 +195,6 @@ $(document).ready(function() {
           // Distancia al centro del ripple
           var dc = utilz.dist(x, y, ripple.cx, ripple.cy);
           if (dc < ripple.radius) {
-            cz1.fS = '#ee0000';
 
             if (Math.abs(rr-dc) < 20) {
               dr = 1-(Math.abs(rr-dc)/20); // Float [0-1]
@@ -223,10 +222,8 @@ $(document).ready(function() {
       } while (matrix[px][py].color !== 2);
 
       ripple = new Ripple(
-        gV.map.w / 2,
-        gV.map.h / 2
-        // gV.map.offset_x + (matrix[px][py].x * gV.map.w),
-        // gV.map.offset_y + (matrix[px][py].y * gV.map.h)
+        gV.map.offset_x + (matrix[px][py].x * gV.map.w),
+        gV.map.offset_y + (matrix[px][py].y * gV.map.h)
       );
     }
 
