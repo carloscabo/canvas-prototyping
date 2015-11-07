@@ -54,7 +54,7 @@ $(document).ready(function() {
       var circle = [];
 
       var t = i / deep;
-      var f = EasingFunctions.easeOutQuint(t);
+      var f = eaze.out.quint(t);
       // console.log(f);
 
       for (var j = 0; j < i; j++) {
