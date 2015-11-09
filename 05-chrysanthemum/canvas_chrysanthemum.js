@@ -4,20 +4,28 @@
 var gV = {
   radius: 0,
   deep: 14,
-  final_angle: Math.PI / 3, // 60º
+  final_angle: 1.0471975511965976, // Math.PI / 3, // 60º
+  final_angle_factor: 1,
+  subangle_factor: 1,
+  speed: 25000,
   // Elemtents to be draw
   circles: [],
   circles_radius: [],
   circles_distance_to_center: [0],
-
+  easing: 'quint',
   // Colores gradientes
   grd_fondo: null,
-
   // Time
   t0: 0,
   tb: 0,
-  t_factor: 0
-
+  t_factor: 0,
+  // Functions
+  'restart': function() {
+    cz1.restart();
+  },
+  'save_image': function() {
+    cz1.saveCanvasToPng();
+  }
 },
 cz1;
 
@@ -32,13 +40,25 @@ $(document).ready(function() {
   // Inicializamos el canvas
   cz1 = new Canvaz('#cnvz');
   cz1.fullScreen();
-  cz1.ctx.translate(cz1.w/2,cz1.h/2);
-  gV.radius = -1 * cz1.h * 0.5 * 0.80;
+
+  var DATgui = new dat.GUI();
+  DATgui.add(gV, 'deep', 2, 28);
+  DATgui.add(gV, 'speed', 1000, 50000);
+  DATgui.add(gV, 'final_angle_factor', -10.0, 1);
+  DATgui.add(gV, 'subangle_factor', -5, 5);
+  DATgui.add(gV, 'easing', [ 'quint', 'cubic', 'quad', 'back', 'bounce' ] );
+  DATgui.add(gV, 'restart');
+  DATgui.add(gV, 'save_image');
+  // DATgui.add(gV, 'save_image');
+  document.getElementById('settings-box').appendChild(DATgui.domElement);
 
   //
-  // Prepairong circle data
+  // Prepairing circle data
   //
   cz1.beforeStart = function() {
+
+    cz1.ctx.translate(cz1.w/2,cz1.h/2);
+    gV.radius = -1 * cz1.h * 0.5 * 0.80;
 
     // Calculate circles
     var last = 0;
@@ -47,11 +67,11 @@ $(document).ready(function() {
       var
         circle = [],
         t = i / gV.deep,
-        f = eaze.out.quint(t);
+        f = eaze.out[gV.easing](t);
 
       for (var j = 0; j < i; j++) {
         var
-          angle = (gV.final_angle / i) * j,
+          angle = (gV.final_angle / i) * j * gV.subangle_factor,
           py = f * gV.radius,
           point = utilz.rotatePoint(0, 0, 0, py, angle);
 
@@ -87,13 +107,22 @@ $(document).ready(function() {
 
   cz1.beforeDraw = function() {
     // Erase all
-    var r = gV.radius - 10;
-    this.clear(
-      r,
-      r,
-      Math.abs(r*2) +20,
-      Math.abs(r*2) +20
+    /*this.clear(
+      -1 * cz1.w/2,
+      -1 * cz1.h/2,
+      cz1.w,
+      cz1.h
+    );*/
+
+    this.ctx.rect(
+      -1 * cz1.w/2,
+      -1 * cz1.h/2,
+      cz1.w,
+      cz1.h
     );
+    cz1.ctx.globalCompositeOperation = 'source-over';
+    cz1.fS = "rgb(24,24,24)"
+    this.ctx.fill();
 
     // Add bg circle
     /*cz1.ctx.globalCompositeOperation = 'source-over';
@@ -112,7 +141,7 @@ $(document).ready(function() {
 
       // Rotate level of circles
       var tn = Date.now(); // Time now
-      gV.t_factor = (tn - gV.t0) / 25000 / i;
+      gV.t_factor = (tn - gV.t0) / gV.speed / (i + gV.final_angle_factor);
       if (gV.tp > 1) { gV.tp = gV.tp -1; gV.t0 = tn; }
 
       var stage_angle = 2 * Math.PI * gV.t_factor;
@@ -177,7 +206,7 @@ $(document).ready(function() {
           grd_tapa.addColorStop(0,"rgba(24,24,24,1)");
           grd_tapa.addColorStop(1,"rgba(24,24,24,0)");
           cz1.fS = grd_tapa;
-          cz1.ctx.globalCompositeOperation = 'destination-out';
+          cz1.ctx.globalCompositeOperation = 'source-over';
           cz1.plot(0, 0, Math.abs(gV.circles[i][0][1]));
         }
 
@@ -190,19 +219,16 @@ $(document).ready(function() {
 
   };
 
-
   // Called on window resize
   cz1.restart = function () {
     cz1.stopAnim();
+    cz1.fullScreen();
 
     gV.radius = 0,
     gV.circles.length = 0;
     gV.circles_radius.length = 0;
-    gV.circles_distance_to_center.length = 0;
+    gV.circles_distance_to_center = [0];
 
-    console.log(gV);
-
-    cz1.beforeStart();
     cz1.start();
   }
 
