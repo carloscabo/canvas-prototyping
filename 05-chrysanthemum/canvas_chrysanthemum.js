@@ -99,7 +99,7 @@ $(document).ready(function() {
 
       // Rotate level of circles
       var tn = Date.now(); // Time now
-      gV.t_factor = (tn - gV.t0) / 150000;
+      gV.t_factor = (tn - gV.t0) / 25000 / i;
       if (gV.tp > 1) { gV.tp = gV.tp -1; gV.t0 = tn; }
       var stage_angle = 2 * Math.PI * gV.t_factor;
       cz1.ctx.rotate(stage_angle);
