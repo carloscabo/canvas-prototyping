@@ -10,7 +10,12 @@ var gV = {
   circles_radius: [],
 
   // Colores gradientes
-  grd_fondo: null
+  grd_fondo: null,
+
+  // Time
+  t0: 0,
+  tb: 0,
+  t_factor: 0
 
 },
 cz1;
@@ -69,6 +74,8 @@ $(document).ready(function() {
     );
     gV.grd_fondo.addColorStop(0,"#242424");
     gV.grd_fondo.addColorStop(1,"#404040");
+
+    gV.t0 = Date.now();
   };
 
   cz1.beforeDraw = function() {
@@ -80,6 +87,7 @@ $(document).ready(function() {
     cz1.fS = gV.grd_fondo;
     cz1.plot(0, 0, Math.abs(gV.radius-4));
     cz1.circle(0, 0, Math.abs(gV.radius-4));
+
   };
 
   //
@@ -88,7 +96,13 @@ $(document).ready(function() {
   cz1.draw = function() {
 
     for (var i = gV.circles.length - 1; i >= 0; i--) {
-      // cz1.ctx.rotate(Math.PI / 30 / i);
+
+      // Rotate level of circles
+      var tn = Date.now(); // Time now
+      gV.t_factor = (tn - gV.t0) / 150000;
+      if (gV.tp > 1) { gV.tp = gV.tp -1; gV.t0 = tn; }
+      var stage_angle = 2 * Math.PI * gV.t_factor;
+      cz1.ctx.rotate(stage_angle);
 
       for (var k = 0; k < 6; k++) {
 
@@ -139,7 +153,11 @@ $(document).ready(function() {
 
         }
 
-      }; // Rotate stage
+      }; // Draw level
+
+      // Rotate level of circles
+      cz1.ctx.rotate(-stage_angle);
+
     }; // For i
 
 
