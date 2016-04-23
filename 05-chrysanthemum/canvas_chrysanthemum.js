@@ -24,7 +24,7 @@ var gV = {
     cz1.restart();
   },
   'save_image': function() {
-    cz1.saveCanvasToPng();
+    cz1.saveCanvasToPng('../img/carlos_cabo_gonzalez_logo_home.png');
   }
 },
 cz1;
@@ -235,6 +235,3 @@ $(document).ready(function() {
   cz1.start();
 
 });
-
-
-

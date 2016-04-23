@@ -128,12 +128,17 @@ Canvaz.prototype.start = function() {
 
   // Starts internal timer
   this.timer.initial = Date.now();
-  if (this.frameRate > 0) {
-    // Use setInterval
-    this.animateSI();
+  // If drawOnce defined dont call loop
+  if (typeof this.drawOnce === 'function') {
+    this.drawOnce();
   } else {
-    // Use requestFrameAnim
-    this.animate();
+    if (this.frameRate > 0) {
+      // Use setInterval
+      this.animateSI();
+    } else {
+      // Use requestFrameAnim
+      this.animate();
+    }
   }
 }
 
@@ -325,9 +330,9 @@ Canvaz.prototype.beforeDraw = function () {
   // Runs just before draw();
 }
 
-Canvaz.prototype.drawOnce = function () {
+/*Canvaz.prototype.drawOnce = function () {
   // Draws scene once
-}
+}*/
 
 Canvaz.prototype.draw = function () {
   // Draws scene
