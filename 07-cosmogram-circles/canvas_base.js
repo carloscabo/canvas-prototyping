@@ -2,7 +2,8 @@
 
 /* Global vars */
 var gV = {
-  radius: 60,
+  radius: 250,
+  points: 200,
   x: 0,
   y: 0
 },
@@ -44,15 +45,28 @@ $(document).ready(function() {
     }
   };
 
-  cz1.draw = function() {
+  cz1.drawOnce = function() {
     cz1.sS = '#666';
+    cz1.sS = 'rgba(255,255,255,0.1)';
     cz1.fS = '#f00';
-    cz1.plot(gV.x, gV.y, gV.radius);
+    cz1.gCO = 'add';
+
+    var
+      points = [],
+      num_points = 300;
+    for (var i = 0; i < num_points; i++) {
+      var
+        x = gV.x + gV.radius * Math.cos( Math.PI * 2 / num_points * i),
+        y = gV.y + gV.radius * Math.sin( Math.PI * 2 / num_points * i);
+      points.push( [x,y] );
+      // cz1.plot(x, y, 2);
+    }
+    var random_point = points[Math.floor(Math.random()*points.length)];
+    for (var i = 0, len = points.length; i < len; i++) {
+      cz1.line( random_point[0], random_point[1],points[i][0], points[i][1] );
+    }
   };
 
   cz1.start();
 
 });
-
-
-
