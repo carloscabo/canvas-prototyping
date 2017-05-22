@@ -2,13 +2,20 @@
 
 /* Global vars */
 var gV = {
-  force_radius: 4,
+  particle_radius: 18,
   cx: 0,
   cy: 0,
   num_particles: 30
 },
 cz1, // Canvas
 particles = []; // Particles array
+
+function rotate(x, y, sin, cos, reverse) {
+  return {
+    x: (reverse) ? (x * cos + y * sin) : (x * cos - y * sin),
+    y: (reverse) ? (y * cos - x * sin) : (y * cos + x * sin)
+  };
+}
 
 function randomPointInsideCircle( cx, cy, cr) {
   var
@@ -26,7 +33,8 @@ function randomPointInsideCircle( cx, cy, cr) {
 }
 
 // Particle
-function Particle ( position, velocity, radius, mass ) {
+function Particle ( id, position, velocity, radius, mass ) {
+  this.id = id;
   this.acceleration = { x: 0, y: 0 };
   this.position = position;
   this.velocity = velocity;
@@ -95,6 +103,7 @@ $(document).ready(function() {
     for (var i = 0, len = gV.num_particles; i < len; i++) {
       particles.push(
         new Particle(
+          i, // Numeric id
           randomPointInsideCircle(gV.cx, gV.cy, cz1.w / 2 * 0.8)
           /*
           {
@@ -105,7 +114,7 @@ $(document).ready(function() {
             x: 0,
             y: 0
           },
-          18, // Radius
+          gV.particle_radius, // Radius
           1 // Mass
         )
       );
@@ -113,6 +122,7 @@ $(document).ready(function() {
 
     // Center force
     center = new Particle(
+      -1,
       {
         x: gV.cx,
         y: gV.cy
@@ -122,7 +132,7 @@ $(document).ready(function() {
         y: 0
       },
       10, // Radius
-      10000000
+      100
     );
 
   };
@@ -135,14 +145,49 @@ $(document).ready(function() {
     cz1.sS = '#666';
     cz1.fS = '#f00';
 
+    var
+      temp_forces = [];
+      temp_forces.push( center );
+
     for (var i = 0, len = particles.length; i < len; i++) {
       var
-        p = particles[i],
-        temp_forces = [];
+        p = particles[i];
 
       // temp_forces = particles.slice(0);
       // temp_forces.splice(i, 1);
-      temp_forces.push( center );
+
+      cz1.fS = '#f00';
+      for (var j = 0; j < len; j++) {
+        if ( i !== j ) {
+          var
+            p_target = particles[j],
+            d = utilz.dist( p.position.x, p.position.y, p_target.position.x, p_target.position.y );
+         if ( d < gV.particle_radius * 2 ) {
+          var
+            dx = p.position.x - p_target.position.x,
+            dy = p.position.y - p_target.position.y,
+            angle = Math.atan2(dy, dx),
+            sin = Math.sin(angle),
+            cos = Math.cos(angle),
+
+            //rotate ball0's velocity
+            vel0 = rotate(p.velocity.x, p.velocity.x, sin, cos, true),
+
+            //rotate ball1's velocity
+            vel1 = rotate(p_target.velocity.x, p_target.velocity.x, sin, cos, true),
+
+            vxTotal = vel0.x - vel1.x,
+            vyTotal = vel0.y - vel1.y;
+            vel0.x = ((p.mass - p_target.mass) * vel0.x + 2 * p_target.mass * vel1.x) / (p.mass + p_target.mass);
+            vel1.x = vxTotal + vel0.x;
+
+            p.position.x += vel0.x;
+            p_target.position.x += vel1.x;
+
+            cz1.fS = '#fff';
+          }
+        }
+      }
 
       p.calculateForces( temp_forces );
       p.update();
