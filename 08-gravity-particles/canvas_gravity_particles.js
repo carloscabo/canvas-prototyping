@@ -10,6 +10,21 @@ var gV = {
 cz1, // Canvas
 particles = []; // Particles array
 
+function randomPointInsideCircle( cx, cy, cr) {
+  var
+    t = 2 * Math.PI * Math.random(),
+    u = Math.random() + Math.random(),
+    r = 0;
+  if ( u > 1 ) {
+    r =1;
+  } else {
+    r = u;
+  }
+  // Inside circle
+  cr = Math.random() * cr;
+  return { x: cx + cr * Math.cos( t ), y: cy + cr * Math.sin( t ) };
+}
+
 // Particle
 function Particle ( position, velocity, radius, mass ) {
   this.acceleration = { x: 0, y: 0 };
@@ -80,16 +95,18 @@ $(document).ready(function() {
     for (var i = 0, len = gV.num_particles; i < len; i++) {
       particles.push(
         new Particle(
+          randomPointInsideCircle(gV.cx, gV.cy, cz1.w / 2 * 0.8)
+          /*
           {
             x: parseInt( Math.random() * cz1.w, 10 ),
             y: parseInt( Math.random() * cz1.h, 10 )
-          },
+          }*/,
           {
             x: 0,
             y: 0
           },
           18, // Radius
-          100 // Mass
+          1 // Mass
         )
       );
     }
@@ -121,9 +138,10 @@ $(document).ready(function() {
     for (var i = 0, len = particles.length; i < len; i++) {
       var
         p = particles[i],
-        temp_forces = particles.slice(0);
+        temp_forces = [];
 
-      temp_forces.splice(i, 1);
+      // temp_forces = particles.slice(0);
+      // temp_forces.splice(i, 1);
       temp_forces.push( center );
 
       p.calculateForces( temp_forces );
