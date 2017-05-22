@@ -33,42 +33,42 @@ function randomPointInsideCircle( cx, cy, cr) {
 }
 
 // Particle
-function Particle ( id, position, velocity, radius, mass ) {
+function Particle ( id, pos, vel, radius, mass ) {
   this.id = id;
-  this.acceleration = { x: 0, y: 0 };
-  this.position = position;
-  this.velocity = velocity;
+  this.acc = { x: 0, y: 0 };
+  this.pos = pos;
+  this.vel = vel;
   this.radius = radius;
   this.mass = mass;
 }
 
 Particle.prototype.calculateForces = function ( forces ) {
   var
-    totalAccelerationX = 0,
-    totalAccelerationY = 0;
+    totalaccX = 0,
+    totalaccY = 0;
 
   for ( var i = 0, len = forces.length; i < len; i++ ) {
     // inlining what should be Vector object methods for performance reasons
     var
       force   = forces[i],
-      vectorX = force.position.x - this.position.x,
-      vectorY = force.position.y - this.position.y,
+      vectorX = force.pos.x - this.pos.x,
+      vectorY = force.pos.y - this.pos.y,
       force   = force.mass / Math.pow((vectorX * vectorX + force.mass / 2 + vectorY * vectorY + force.mass / 2), 1.5);
-    totalAccelerationX += vectorX * force;
-    totalAccelerationY += vectorY * force;
+    totalaccX += vectorX * force;
+    totalaccY += vectorY * force;
   }
-  this.acceleration = {
-    x: totalAccelerationX,
-    y: totalAccelerationY
+  this.acc = {
+    x: totalaccX,
+    y: totalaccY
   };
-  // console.log( this.acceleration );
+  // console.log( this.acc );
 };
 
 Particle.prototype.update = function () {
-  this.velocity.x += this.acceleration.x;
-  this.velocity.y += this.acceleration.y;
-  this.position.x += this.velocity.x;
-  this.position.y += this.velocity.y;
+  this.vel.x += this.acc.x;
+  this.vel.y += this.acc.y;
+  this.pos.x += this.vel.x;
+  this.pos.y += this.vel.y;
 };
 
 $(document).ready(function() {
@@ -132,7 +132,7 @@ $(document).ready(function() {
         y: 0
       },
       10, // Radius
-      100
+      1000
     );
 
   };
@@ -161,28 +161,33 @@ $(document).ready(function() {
         if ( i !== j ) {
           var
             p_target = particles[j],
-            d = utilz.dist( p.position.x, p.position.y, p_target.position.x, p_target.position.y );
-         if ( d < gV.particle_radius * 2 ) {
-          var
-            dx = p.position.x - p_target.position.x,
-            dy = p.position.y - p_target.position.y,
-            angle = Math.atan2(dy, dx),
-            sin = Math.sin(angle),
-            cos = Math.cos(angle),
+            d = utilz.dist( p.pos.x, p.pos.y, p_target.pos.x, p_target.pos.y );
+          if ( d < gV.particle_radius * 2 ) {
+            var
+              dx = p.pos.x - p_target.pos.x,
+              dy = p.pos.y - p_target.pos.y,
+              normalX = dx / d,
+              normalY = dy / d,
+              midpointX = (p.pos.x + p_target.pos.x) / 2,
+              midpointY = (p.pos.y + p_target.pos.y) / 2;
 
-            //rotate ball0's velocity
-            vel0 = rotate(p.velocity.x, p.velocity.x, sin, cos, true),
+            p.pos.x = midpointX - normalX * p.radius;
+            p.pos.y = midpointY - normalY * p.radius;
+            p_target.x = midpointX + normalX * p_target.radius;
+            p_target.y = midpointY + normalY * p_target.radius;
 
-            //rotate ball1's velocity
-            vel1 = rotate(p_target.velocity.x, p_target.velocity.x, sin, cos, true),
+            var
+              dVector = (p.vel.x - p_target.vel.x) * normalX;
 
-            vxTotal = vel0.x - vel1.x,
-            vyTotal = vel0.y - vel1.y;
-            vel0.x = ((p.mass - p_target.mass) * vel0.x + 2 * p_target.mass * vel1.x) / (p.mass + p_target.mass);
-            vel1.x = vxTotal + vel0.x;
+            dVector += (p.vel.y - p_target.vel.y) * normalY;
 
-            p.position.x += vel0.x;
-            p_target.position.x += vel1.x;
+            var
+              dvx = dVector * normalX,
+              dvy = dVector * normalY;
+            p.vel.x -= dvx;
+            p.vel.y -= dvy;
+            p_target.vel.x += dvx;
+            p_target.vel.y += dvy;
 
             cz1.fS = '#fff';
           }
@@ -191,7 +196,7 @@ $(document).ready(function() {
 
       p.calculateForces( temp_forces );
       p.update();
-      cz1.plot( p.position.x, p.position.y, p.radius );
+      cz1.plot( p.pos.x, p.pos.y, p.radius );
     }
 
   };
