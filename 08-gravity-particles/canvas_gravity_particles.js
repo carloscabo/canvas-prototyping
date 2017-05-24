@@ -2,7 +2,7 @@
 
 /* Global vars */
 var gV = {
-  particle_radius: 12,
+  particle_radius: 20,
   cx: 0,
   cy: 0,
   num_particles: 100,
@@ -109,8 +109,8 @@ $(document).ready(function() {
             x: Math.random() * 2 - 1,
             y: Math.random() * 2 - 1
           },
-          gV.particle_radius, // Radius
-          100000 // Mass
+          4 + Math.random() * gV.particle_radius, // Radius
+          10 // Mass
         )
       );
     }
@@ -132,7 +132,7 @@ $(document).ready(function() {
 
     // Center force
     pulse = new Particle(
-      'A',
+      'B',
       {
         x: gV.cx,
         y: gV.cy
@@ -186,12 +186,13 @@ $(document).ready(function() {
             dx = p2.pos.x - p1.pos.x,
             dy = p2.pos.y - p1.pos.y,
             d = utilz.dist( p1.pos.x, p1.pos.y, p2.pos.x, p2.pos.y );
-          if ( d < gV.particle_radius * 2 ) {
+          if ( d < ( p1.radius + p2.radius ) ) {
             var
             normalX = dx / d,
             normalY = dy / d,
-            midpointX = (p1.pos.x + p2.pos.x) / 2,
-            midpointY = (p1.pos.y + p2.pos.y) / 2;
+            // midpointX = (p1.pos.x + p2.pos.x) / 2, // Same size
+            midpointX = (( p1.pos.x * p2.radius) + ( p2.pos.x * p1.radius)) / (p1.radius + p2.radius),
+            midpointY = (( p1.pos.y * p2.radius) + ( p2.pos.y * p1.radius)) / (p1.radius + p2.radius);
 
             p1.pos.x = midpointX - normalX * p1.radius;
             p1.pos.y = midpointY - normalY * p1.radius;
