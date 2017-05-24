@@ -2,20 +2,14 @@
 
 /* Global vars */
 var gV = {
-  particle_radius: 18,
+  particle_radius: 12,
   cx: 0,
   cy: 0,
-  num_particles: 30
+  num_particles: 100,
+  is_mouse_down: false
 },
 cz1, // Canvas
 particles = []; // Particles array
-
-function rotate(x, y, sin, cos, reverse) {
-  return {
-    x: (reverse) ? (x * cos + y * sin) : (x * cos - y * sin),
-    y: (reverse) ? (y * cos - x * sin) : (y * cos + x * sin)
-  };
-}
 
 function randomPointInsideCircle( cx, cy, cr) {
   var
@@ -79,7 +73,8 @@ $(document).ready(function() {
   cz1.fullScreen();
 
   var
-    center;
+    center,
+    pulse;
 
   // HSL
   var
@@ -104,25 +99,25 @@ $(document).ready(function() {
       particles.push(
         new Particle(
           i, // Numeric id
-          randomPointInsideCircle(gV.cx, gV.cy, cz1.w / 2 * 0.8)
+          randomPointInsideCircle(gV.cx, gV.cy, Math.max(cz1.w, cz1.h) / 2 * 0.8)
           /*
           {
             x: parseInt( Math.random() * cz1.w, 10 ),
             y: parseInt( Math.random() * cz1.h, 10 )
           }*/,
           {
-            x: 0,
-            y: 0
+            x: Math.random() * 2 - 1,
+            y: Math.random() * 2 - 1
           },
           gV.particle_radius, // Radius
-          1 // Mass
+          100000 // Mass
         )
       );
     }
 
     // Center force
     center = new Particle(
-      -1,
+      'A',
       {
         x: gV.cx,
         y: gV.cy
@@ -131,8 +126,23 @@ $(document).ready(function() {
         x: 0,
         y: 0
       },
-      10, // Radius
-      1000
+      180000, // Radius
+      20000
+    );
+
+    // Center force
+    pulse = new Particle(
+      'A',
+      {
+        x: gV.cx,
+        y: gV.cy
+      },
+      {
+        x: 0,
+        y: 0
+      },
+      2000, // Radius
+      800
     );
 
   };
@@ -147,56 +157,67 @@ $(document).ready(function() {
 
     var
       temp_forces = [];
-      temp_forces.push( center );
+
+    temp_forces.push( center );
+    if (gV.is_mouse_down && temp_forces.length < 2 ) {
+      console.log(temp_forces.length);
+      temp_forces.push(pulse);
+    }
 
     for (var i = 0, len = particles.length; i < len; i++) {
       var
-        p = particles[i];
+        p1 = particles[i];
 
-      // temp_forces = particles.slice(0);
-      // temp_forces.splice(i, 1);
+      if (p1.pos.x < 0 || p1.pos.x > cz1.w || p1.pos.y < 0 || p1.pos.y > cz1.h) {
+        console.log('outside');
+        p1.pos.x = 10;
+        p1.pos.y = 10;
+        p1.acc.x = 0;
+        p1.acc.y = 0;
+        p1.vel.x = 0;
+        p1.vel.y = 0;
+      };
 
       cz1.fS = '#f00';
       for (var j = 0; j < len; j++) {
         if ( i !== j ) {
           var
-            p_target = particles[j],
-            d = utilz.dist( p.pos.x, p.pos.y, p_target.pos.x, p_target.pos.y );
+            p2 = particles[j],
+            dx = p2.pos.x - p1.pos.x,
+            dy = p2.pos.y - p1.pos.y,
+            d = utilz.dist( p1.pos.x, p1.pos.y, p2.pos.x, p2.pos.y );
           if ( d < gV.particle_radius * 2 ) {
             var
-              dx = p.pos.x - p_target.pos.x,
-              dy = p.pos.y - p_target.pos.y,
-              normalX = dx / d,
-              normalY = dy / d,
-              midpointX = (p.pos.x + p_target.pos.x) / 2,
-              midpointY = (p.pos.y + p_target.pos.y) / 2;
+            normalX = dx / d,
+            normalY = dy / d,
+            midpointX = (p1.pos.x + p2.pos.x) / 2,
+            midpointY = (p1.pos.y + p2.pos.y) / 2;
 
-            p.pos.x = midpointX - normalX * p.radius;
-            p.pos.y = midpointY - normalY * p.radius;
-            p_target.x = midpointX + normalX * p_target.radius;
-            p_target.y = midpointY + normalY * p_target.radius;
+            p1.pos.x = midpointX - normalX * p1.radius;
+            p1.pos.y = midpointY - normalY * p1.radius;
+            p2.pos.x = midpointX + normalX * p2.radius;
+            p2.pos.y = midpointY + normalY * p2.radius;
 
             var
-              dVector = (p.vel.x - p_target.vel.x) * normalX;
+              dVector = ( p1.vel.x - p2.vel.x ) * normalX;
+            dVector += (p1.vel.y - p2.vel.y) * normalY;
 
-            dVector += (p.vel.y - p_target.vel.y) * normalY;
-
-            var
-              dvx = dVector * normalX,
-              dvy = dVector * normalY;
-            p.vel.x -= dvx;
-            p.vel.y -= dvy;
-            p_target.vel.x += dvx;
-            p_target.vel.y += dvy;
-
+            var dvx = dVector * normalX;
+            var dvy = dVector * normalY;
+            p1.vel.x -= dvx;
+            p1.vel.y -= dvy;
+            p1.vel.x *= 0.9;
+            p1.vel.y *= 0.9;
             cz1.fS = '#fff';
           }
         }
       }
 
-      p.calculateForces( temp_forces );
-      p.update();
-      cz1.plot( p.pos.x, p.pos.y, p.radius );
+      // temp_forces = particles.slice(0);
+      // temp_forces.splice(i, 1);
+      p1.update();
+      p1.calculateForces(temp_forces);
+      cz1.plot( p1.pos.x, p1.pos.y, p1.radius );
     }
 
   };
@@ -205,5 +226,11 @@ $(document).ready(function() {
 
 });
 
-
+$(document)
+.on('mousedown touchstart',function(e) {
+  gV.is_mouse_down = true;
+})
+.on('mouseup touchend', function (e) {
+  gV.is_mouse_down = false;
+});
 
