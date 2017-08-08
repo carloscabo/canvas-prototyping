@@ -1,15 +1,56 @@
 'use strict';
 
+// #fae6ba rgb(250,230,186)   hsl(41,86%,85%)
+// #006e84 rgb(0,110,132)     hsl(190,100%,26%)
+// #83d9cf rgb(131, 217, 207) hsl(173, 53 %,68 %)
+// #ffffff rgb(255, 255, 255) hsl(0, 0 %,100 %)
+// #eb00db rgb(235, 0, 219)   hsl(304, 100 %,46 %)
+
+var colors = [ // HSL
+  [ 41,86,85],
+  [ 190,100,26],
+  [ 173, 53 ,68 ],
+  [ 0, 0 ,100 ],
+  [ 304, 100 ,46 ]
+]
+
 /* Global vars */
 var gV = {
   particle_radius: 20,
   cx: 0,
   cy: 0,
-  num_particles: 100,
+  num_particles: 300,
   is_mouse_down: false
 },
 cz1, // Canvas
 particles = []; // Particles array
+
+function  applyForce() {
+  var
+    totalaccX = 0,
+    totalaccY = 0;
+
+  for (var i = 0, len = particles.length; i < len; i++) {
+    var
+      p = particles[i],
+      distance = Math.sqrt(
+        cz1.center.x * p.pos.x +
+        cz1.center.y * p.pos.y
+      ),
+      forceDirection = {
+        x: p.pos.x / distance,
+        y: p.pos.y / distance
+      },
+      maxDistance = Math.max( cz1.w, cz1.h ),
+      force = (maxDistance - distance) / maxDistance;
+
+    if (force < 0) force = 0;
+
+    p.vel.x += forceDirection.x * force * 100; // * timeElapsedSinceLastFrame;
+    p.vel.y += forceDirection.y * force * 100; // * timeElapsedSinceLastFrame;
+  }
+
+}
 
 function randomPointInsideCircle( cx, cy, cr) {
   var
@@ -34,6 +75,7 @@ function Particle ( id, pos, vel, radius, mass ) {
   this.vel = vel;
   this.radius = radius;
   this.mass = mass;
+  this.color = colors[Math.floor(Math.random() * colors.length)];
 }
 
 Particle.prototype.calculateForces = function ( forces ) {
@@ -44,18 +86,16 @@ Particle.prototype.calculateForces = function ( forces ) {
   for ( var i = 0, len = forces.length; i < len; i++ ) {
     // inlining what should be Vector object methods for performance reasons
     var
-      force   = forces[i],
-      vectorX = force.pos.x - this.pos.x,
-      vectorY = force.pos.y - this.pos.y,
-      force   = force.mass / Math.pow((vectorX * vectorX + force.mass / 2 + vectorY * vectorY + force.mass / 2), 1.5);
+      f = forces[i],
+      vectorX = forces[i].pos.x - this.pos.x,
+      vectorY = forces[i].pos.y - this.pos.y,
+      force = forces[i].mass / Math.pow((vectorX * vectorX + forces[i].mass / 2 + vectorY * vectorY + forces[i].mass / 2), 1.5);
+
     totalaccX += vectorX * force;
     totalaccY += vectorY * force;
   }
-  this.acc = {
-    x: totalaccX,
-    y: totalaccY
-  };
-  // console.log( this.acc );
+  this.acc.x = totalaccX;
+  this.acc.y = totalaccY;
 };
 
 Particle.prototype.update = function () {
@@ -76,14 +116,6 @@ $(document).ready(function() {
     center,
     pulse;
 
-  // HSL
-  var
-    palette = [
-    [322, 35, 59], // [3, 91, 68],  // Rojo [248,108,101],
-    [351, 46, 67], // [121, 35, 55],// Verde [98,180,99],
-    [54, 100, 47]  // [43, 79, 59]  // Amarillo [233,187,68]
-  ];
-
   // Canvas
   cz1.clear = function() {
     this.fS = '#242424';
@@ -95,6 +127,7 @@ $(document).ready(function() {
   cz1.beforeStart = function() {
     gV.cx = cz1.center.x;
     gV.cy = cz1.center.y;
+    particles = [];
     for (var i = 0, len = gV.num_particles; i < len; i++) {
       particles.push(
         new Particle(
@@ -109,8 +142,8 @@ $(document).ready(function() {
             x: Math.random() * 2 - 1,
             y: Math.random() * 2 - 1
           },
-          4 + Math.random() * gV.particle_radius, // Radius
-          10 // Mass
+          8 + Math.random() * gV.particle_radius, // Radius
+          1 // Mass
         )
       );
     }
@@ -126,8 +159,8 @@ $(document).ready(function() {
         x: 0,
         y: 0
       },
-      180000, // Radius
-      20000
+      200000, // Radius
+      10000000
     );
 
     // Center force
@@ -141,8 +174,8 @@ $(document).ready(function() {
         x: 0,
         y: 0
       },
-      2000, // Radius
-      800
+      800, // Radius
+      -2000
     );
 
   };
@@ -168,6 +201,7 @@ $(document).ready(function() {
       var
         p1 = particles[i];
 
+      /*
       if (p1.pos.x < 0 || p1.pos.x > cz1.w || p1.pos.y < 0 || p1.pos.y > cz1.h) {
         console.log('outside');
         p1.pos.x = 10;
@@ -177,8 +211,9 @@ $(document).ready(function() {
         p1.vel.x = 0;
         p1.vel.y = 0;
       };
+      */
 
-      cz1.fS = '#f00';
+      cz1.fS = 'hsl(' + p1.color[0] + ',' + p1.color[1] + '%,' + Math.floor(p1.color[2] * 0.8) + '%)';
       for (var j = 0; j < len; j++) {
         if ( i !== j ) {
           var
@@ -207,9 +242,9 @@ $(document).ready(function() {
             var dvy = dVector * normalY;
             p1.vel.x -= dvx;
             p1.vel.y -= dvy;
-            p1.vel.x *= 0.9;
-            p1.vel.y *= 0.9;
-            cz1.fS = '#fff';
+            p1.vel.x *= 0.8;
+            p1.vel.y *= 0.8;
+            cz1.fS = 'hsl(' + p1.color[0] + ',' + p1.color[1] + '%,' + Math.floor(p1.color[2] * 1.0) + '%)';
           }
         }
       }
@@ -218,7 +253,7 @@ $(document).ready(function() {
       // temp_forces.splice(i, 1);
       p1.update();
       p1.calculateForces(temp_forces);
-      cz1.plot( p1.pos.x, p1.pos.y, p1.radius );
+      cz1.plot( p1.pos.x, p1.pos.y, p1.radius - 2 );
     }
 
   };
@@ -228,10 +263,7 @@ $(document).ready(function() {
 });
 
 $(document)
-.on('mousedown touchstart',function(e) {
-  gV.is_mouse_down = true;
-})
-.on('mouseup touchend', function (e) {
-  gV.is_mouse_down = false;
+.on('click',function(e) {
+  applyForce();
 });
 
