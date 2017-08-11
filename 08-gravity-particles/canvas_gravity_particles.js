@@ -1,5 +1,15 @@
 'use strict';
 
+// AUdio
+
+var
+  webaudio = new WebAudio(),
+  sound = webaudio.createSound();
+// load sound.wav and play it
+sound.load('sfx-scifi-hit.mp3', function (sound) {
+  // sound.play();
+});
+
 // #fae6ba rgb(250,230,186)   hsl(41,86%,85%)
 // #006e84 rgb(0,110,132)     hsl(190,100%,26%)
 // #83d9cf rgb(131, 217, 207) hsl(173, 53 %,68 %)
@@ -16,7 +26,8 @@ var colors = [ // HSL
 
 /* Global vars */
 var gV = {
-  particle_radius: 20,
+  min_particle_radius: 8,
+  max_particle_radius: 20,  // 20,
   cx: 0,
   cy: 0,
   num_particles: 300,
@@ -25,7 +36,14 @@ var gV = {
 cz1, // Canvas
 particles = []; // Particles array
 
-function  applyForce() {
+function applyForce( force_factor ) {
+
+  if ( typeof force_factor === 'undefined' ) {
+    force_factor = 45;
+  }
+
+  sound.play();
+
   var
     totalaccX = 0,
     totalaccY = 0;
@@ -34,8 +52,8 @@ function  applyForce() {
     var
       p = particles[i],
       distance = Math.sqrt(
-        cz1.center.x * p.pos.x +
-        cz1.center.y * p.pos.y
+        p.pos.x * p.pos.x +
+        p.pos.y * p.pos.y
       ),
       forceDirection = {
         x: p.pos.x / distance,
@@ -44,10 +62,12 @@ function  applyForce() {
       maxDistance = Math.max( cz1.w, cz1.h ),
       force = (maxDistance - distance) / maxDistance;
 
-    if (force < 0) force = 0;
+    // if (force < 0) force = 0;
+    // force *= maxDistance / distance * 18;
+    force *= force_factor;
 
-    p.vel.x += forceDirection.x * force * 100; // * timeElapsedSinceLastFrame;
-    p.vel.y += forceDirection.y * force * 100; // * timeElapsedSinceLastFrame;
+    p.vel.x += forceDirection.x * force; // * timeElapsedSinceLastFrame;
+    p.vel.y += forceDirection.y * force; // * timeElapsedSinceLastFrame;
   }
 
 }
@@ -120,19 +140,21 @@ $(document).ready(function() {
   cz1.clear = function() {
     this.fS = '#242424';
     this.ctx.beginPath();
-    this.ctx.rect(0, 0, this.w, this.h);
+    this.ctx.rect( this.w / -2, this.h / -2, this.w, this.h);
     this.ctx.fill();
   };
 
   cz1.beforeStart = function() {
-    gV.cx = cz1.center.x;
-    gV.cy = cz1.center.y;
+
+    cz1.ctx.translate(cz1.w / 2, cz1.h / 2);
+    gV.cx = 0;
+    gV.cy = 0;
     particles = [];
     for (var i = 0, len = gV.num_particles; i < len; i++) {
       particles.push(
         new Particle(
           i, // Numeric id
-          randomPointInsideCircle(gV.cx, gV.cy, Math.max(cz1.w, cz1.h) / 2 * 0.8)
+          randomPointInsideCircle(gV.cx, gV.cy, Math.max(cz1.w, cz1.h) * 1.5 )
           /*
           {
             x: parseInt( Math.random() * cz1.w, 10 ),
@@ -142,7 +164,8 @@ $(document).ready(function() {
             x: Math.random() * 2 - 1,
             y: Math.random() * 2 - 1
           },
-          8 + Math.random() * gV.particle_radius, // Radius
+          gV.min_particle_radius + (Math.random() * Math.min(cz1.w, cz1.h) * 0.025 ), // Radius
+          // 8 + Math.random() * gV.max_particle_radius, // Radius
           1 // Mass
         )
       );
@@ -201,18 +224,6 @@ $(document).ready(function() {
       var
         p1 = particles[i];
 
-      /*
-      if (p1.pos.x < 0 || p1.pos.x > cz1.w || p1.pos.y < 0 || p1.pos.y > cz1.h) {
-        console.log('outside');
-        p1.pos.x = 10;
-        p1.pos.y = 10;
-        p1.acc.x = 0;
-        p1.acc.y = 0;
-        p1.vel.x = 0;
-        p1.vel.y = 0;
-      };
-      */
-
       cz1.fS = 'hsl(' + p1.color[0] + ',' + p1.color[1] + '%,' + Math.floor(p1.color[2] * 0.8) + '%)';
       for (var j = 0; j < len; j++) {
         if ( i !== j ) {
@@ -264,6 +275,11 @@ $(document).ready(function() {
 
 $(document)
 .on('click',function(e) {
-  applyForce();
+  clearInterval( timer );
+  applyForce( 15 );
 });
+
+var timer = setInterval(function() {
+  applyForce();
+}, 6000);
 
