@@ -6,16 +6,18 @@
 var gV = {
   radius: 768 / 2,
 
-  room_nuber: 50,
-  max_room_w: 16,
-  min_room_w: 6,
+  room_nuber: 40,
+  max_room_w: 14,
+  min_room_w: 4,
   max_room_h: 16,
   min_room_h: 6,
 
   grid: 8, // Pixels
 
   x: 0,
-  y: 0
+  y: 0,
+
+  overlapping: true
 },
 rooms = [],
 cz1;
@@ -56,7 +58,8 @@ $(document).ready(function() {
     // Create rooms
     for (var i = 0; i < gV.room_nuber; i++) {
       var
-        p1 = getRandomPointInCircle (0, 0, gV.radius / 2);
+        // p1 = getRandomPointInEllipse (0, 0, gV.radius / 2, gV.radius / 2);
+        p1 = getRandomPointInEllipse(0, 0, gV.radius / 4, gV.radius / 4);
       rooms.push( {
         x: p1[0],
         y: p1[1],
@@ -65,7 +68,7 @@ $(document).ready(function() {
       } );
     }
 
-    console.log( rooms );
+    // console.log( rooms );
   };
 
   // ----------------------------------
@@ -75,7 +78,7 @@ $(document).ready(function() {
     // cz1.clear();
   };
 
-  cz1.drawOnce = function() {
+  cz1.draw = function() {
 
     cz1.clear();
 
@@ -90,8 +93,24 @@ $(document).ready(function() {
 
           // If rooms overlap
           if ( roomOverlapping(r1, r2) ) {
-            console.log(r1);
-            console.log(r2);
+            // console.log( 'overlaps' );
+            var
+              d = utilz.dist( r1.x, r1.y, r2.x, r2.y),
+              dx = r2.x - r1.x,
+              dy = r2.y - r1.y,
+              normal = {},
+              vector = {},
+              midpoint = {};
+
+            normal.x = dx / d;
+            normal.y = dy / d;
+            midpoint.x = (r1.x + r2.x) / 2;
+            midpoint.y = (r1.y + r2.y) / 2;
+
+            r1.x -= normal.x;
+            r1.y -= normal.y;
+            r2.x -= normal.x * -1;
+            r2.y -= normal.y * -1;
           }
 
         }
@@ -115,27 +134,23 @@ $(document).ready(function() {
 
 function roomOverlapping ( r1, r2 ) {
   var
-    result    =  false,
+    r2_l = r2.x - (r2.w / 2 * gV.grid),
+    r2_r = r2.x + (r2.w / 2 * gV.grid),
+    r2_t = r2.y - (r2.h / 2 * gV.grid),
+    r2_b = r2.y + (r2.h / 2 * gV.grid),
+    r1_l = r1.x - (r1.w / 2 * gV.grid),
+    r1_r = r1.x + (r1.w / 2 * gV.grid),
+    r1_t = r1.y - (r1.h / 2 * gV.grid),
+    r1_b = r1.y + (r1.h / 2 * gV.grid);
 
-    r1_left   = r1.x - r1.w / 2,
-    r1_right  = r1.x + r1.w / 2,
-    r1_top    = r1.y - r1.h / 2,
-    r1_bottom = r1.y + r1.h / 2,
-
-    r2_left   = r2.x - r2.w / 2,
-    r2_right  = r2.x + r2.w / 2,
-    r2_top    = r2.y - r2.h / 2,
-    r2_bottom = r2.y + r2.h / 2;
-
-  if (r1_left < r2_right && r1_right > r2_left &&
-    r1_top > r2_bottom && r1_bottom < r2_top) {
-      result = true;
-    }
-  return result;
+  return !(r2_l > r1_r ||
+    r2_r < r1_l ||
+    r2_t > r1_b ||
+    r2_b < r1_t);
 }
 
 
-function getRandomPointInCircle( x, y, radius ) {
+function getRandomPointInEllipse(x, y, ellipse_w, ellipse_h ) {
   var
     t = 2 * Math.PI * Math.random(),
     u = Math.random() + Math.random(),
@@ -145,7 +160,7 @@ function getRandomPointInCircle( x, y, radius ) {
   } else {
     r = u;
   }
-  return [ x + ( radius * r * Math.cos( t ) ), y + ( radius * r * Math.sin(t) ) ];
+  return [ x + ( ellipse_w * r * Math.cos(t) ), y + ( ellipse_h * r * Math.sin(t) ) ];
 }
 
 
