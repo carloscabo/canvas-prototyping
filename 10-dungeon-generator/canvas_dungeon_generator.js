@@ -5,10 +5,19 @@
 /* Global vars */
 var gV = {
   radius: 768 / 2,
+
+  room_nuber: 50,
+  max_room_w: 16,
+  min_room_w: 6,
+  max_room_h: 16,
+  min_room_h: 6,
+
   grid: 8, // Pixels
+
   x: 0,
   y: 0
 },
+rooms = [],
 cz1;
 
 $(document).ready(function() {
@@ -33,27 +42,54 @@ $(document).ready(function() {
     this.ctx.fill();
   };
 
+  // ----------------------------------
+  // ----------------------------------
+  // ----------------------------------
   cz1.beforeStart = function() {
-    // Move 0, 0 to center
+
+    // Set fill
     cz1.fS = '#f00';
+
+    // Move 0, 0 to center
     cz1.ctx.translate(cz1.w / 2, cz1.h / 2);
+
+    // Create rooms
+    for (var i = 0; i < gV.room_nuber; i++) {
+      var
+        p1 = getRandomPointInCircle (0, 0, gV.radius / 2);
+      rooms.push( {
+        x: p1[0],
+        y: p1[1],
+        w: gV.min_room_w + Math.floor( Math.random() * ( gV.max_room_w - gV.min_room_w ) ),
+        h: gV.min_room_h + Math.floor( Math.random() * ( gV.max_room_h - gV.min_room_h ) )
+      } );
+    }
+
+    console.log( rooms );
   };
 
+  // ----------------------------------
+  // ----------------------------------
+  // ----------------------------------
   cz1.beforeDraw = function() {
 
   };
 
-  cz1.draw = function() {
+  cz1.drawOnce = function() {
 
-    var
-      p1 = getRandomPointInCircle ( -100, -100, 768 / 2 );
-    cz1.plot( p1[0], p1[1], 4);
+    for (var i = 0, len = rooms.length; i < len; i++) {
+      var
+        room = rooms[i];
+      drawRoom( room );
+
+    }
+
+
   };
 
   cz1.start();
 
 });
-
 
 
 function getRandomPointInCircle( x, y, radius ) {
@@ -69,4 +105,13 @@ function getRandomPointInCircle( x, y, radius ) {
   return [ x + ( radius * r * Math.cos( t ) ), y + ( radius * r * Math.sin(t) ) ];
 }
 
+
+function drawRoom( room ) {
+  cz1.lW = '1px';
+  cz1.fS = 'rgba(45, 93, 180, 0.75)';
+  cz1.sS = '#fff';
+
+  cz1.rect(room.x, room.y, room.w * gV.grid, room.h * gV.grid );
+  cz1.ctx.fill();
+}
 
