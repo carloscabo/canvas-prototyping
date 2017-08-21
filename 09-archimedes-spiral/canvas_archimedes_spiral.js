@@ -28,12 +28,12 @@ $(document).ready(function() {
   gV.centerX = 0;
   gV.centerY = 0;
   gV.radius = cz1.w / 2 - 10;
-  gV.coils = 50;
+  gV.coils = 80;
   gV.rotation = 2 * Math.PI;
 
   gV.thetaMax = gV.coils * 2 * Math.PI;
   gV.awayStep = gV.radius / gV.thetaMax;
-  gV.chord = 4;
+  gV.chord = 12;
   gV.new_time = [];
 
   // HSL
@@ -106,7 +106,7 @@ $(document).ready(function() {
     */
 
     // console.log( gV.chord );
-    gV.chord += 0.01;
+    gV.chord += 0.005;
 
     // capturer.capture( cz1.$can[0] );
 
