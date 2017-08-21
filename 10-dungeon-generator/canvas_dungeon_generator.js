@@ -25,7 +25,7 @@ $(document).ready(function() {
 
   // Inicializamos el canvas
   cz1 = new Canvaz('#cnvz');
-  cz1.fullScreen();
+  // cz1.fullScreen();
 
   // HSL
   var palette = [
@@ -38,7 +38,7 @@ $(document).ready(function() {
   cz1.clear = function() {
     this.fS = '#242424';
     this.ctx.beginPath();
-    this.ctx.rect(- radius, - radius, this.w, this.h);
+    this.ctx.rect( - gV.radius, - gV.radius, gV.radius * 2, gV.radius * 2);
     this.ctx.fill();
   };
 
@@ -72,16 +72,37 @@ $(document).ready(function() {
   // ----------------------------------
   // ----------------------------------
   cz1.beforeDraw = function() {
-
+    // cz1.clear();
   };
 
   cz1.drawOnce = function() {
 
+    cz1.clear();
+
+    // Move to avoid overlap
+    for (var i = 0, len = rooms.length; i < len; i++) {
+      var
+        r1 = rooms[i];
+      for (var j = 0; j < len; j++) {
+        if (i !== j) {
+          var
+            r2 = rooms[j];
+
+          // If rooms overlap
+          if ( roomOverlapping(r1, r2) ) {
+            console.log(r1);
+            console.log(r2);
+          }
+
+        }
+      }
+    }
+
+    // Draw all rooms
     for (var i = 0, len = rooms.length; i < len; i++) {
       var
         room = rooms[i];
       drawRoom( room );
-
     }
 
 
@@ -90,6 +111,28 @@ $(document).ready(function() {
   cz1.start();
 
 });
+
+
+function roomOverlapping ( r1, r2 ) {
+  var
+    result    =  false,
+
+    r1_left   = r1.x - r1.w / 2,
+    r1_right  = r1.x + r1.w / 2,
+    r1_top    = r1.y - r1.h / 2,
+    r1_bottom = r1.y + r1.h / 2,
+
+    r2_left   = r2.x - r2.w / 2,
+    r2_right  = r2.x + r2.w / 2,
+    r2_top    = r2.y - r2.h / 2,
+    r2_bottom = r2.y + r2.h / 2;
+
+  if (r1_left < r2_right && r1_right > r2_left &&
+    r1_top > r2_bottom && r1_bottom < r2_top) {
+      result = true;
+    }
+  return result;
+}
 
 
 function getRandomPointInCircle( x, y, radius ) {
