@@ -158,14 +158,14 @@ $(document).ready(function() {
 
 function roomOverlapping ( r1, r2 ) {
   var
-    r2_l = r2.x - (r2.w / 2 * gV.grid),
-    r2_r = r2.x + (r2.w / 2 * gV.grid),
-    r2_t = r2.y - (r2.h / 2 * gV.grid),
-    r2_b = r2.y + (r2.h / 2 * gV.grid),
-    r1_l = r1.x - (r1.w / 2 * gV.grid),
-    r1_r = r1.x + (r1.w / 2 * gV.grid),
-    r1_t = r1.y - (r1.h / 2 * gV.grid),
-    r1_b = r1.y + (r1.h / 2 * gV.grid);
+    r2_l = r2.x,
+    r2_r = r2.x + r2.w * gV.grid,
+    r2_t = r2.y,
+    r2_b = r2.y + r2.h * gV.grid,
+    r1_l = r1.x,
+    r1_r = r1.x + r1.w * gV.grid,
+    r1_t = r1.y,
+    r1_b = r1.y + r1.h * gV.grid;
 
   return !(r2_l > r1_r ||
     r2_r < r1_l ||
@@ -190,7 +190,6 @@ function getRandomPointInEllipse(x, y, ellipse_w, ellipse_h ) {
   ];
 }
 
-
 function roundm( n, m ) {
   return Math.floor( ( ( n + m - 1 ) / m ) ) * m
 }
@@ -203,7 +202,10 @@ function drawRoom( room ) {
   if  ( room.area > gV.average_area * gV.average_area_limit ) {
     cz1.fS = 'rgba(180, 93, 45, 0.75)';
   }
-  cz1.rect(room.x, room.y, room.w * gV.grid, room.h * gV.grid );
+  // cz1.rect(room.x, room.y, room.w * gV.grid, room.h * gV.grid );
+  cz1.ctx.beginPath();
+  cz1.ctx.rect( room.x, room.y, room.w * gV.grid, room.h * gV.grid );
+  cz1.ctx.closePath();
   cz1.ctx.fill();
 }
 
