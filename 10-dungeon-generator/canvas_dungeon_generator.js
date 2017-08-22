@@ -6,13 +6,13 @@
 var gV = {
   radius: 768 / 2,
 
-  room_number: 60,
-  max_room_w: 14,
+  room_number: 20,
+  max_room_w: 10,
   min_room_w: 2,
   max_room_h: 16,
   min_room_h: 2,
 
-  grid: 6, // Pixels
+  grid: 16, // Pixels
 
   x: 0,
   y: 0,
@@ -104,6 +104,8 @@ $(document).ready(function() {
 
     cz1.clear();
 
+    drawGrid();
+
     // Move to avoid overlap
     for (var i = 0, len = rooms.length; i < len; i++) {
       var
@@ -129,10 +131,10 @@ $(document).ready(function() {
             midpoint.x = (r1.x + r2.x) / 2;
             midpoint.y = (r1.y + r2.y) / 2;
 
-            r1.x -= normal.x * 1.0;
-            r1.y -= normal.y * 0.71;
-            r2.x -= normal.x * -1.01;
-            r2.y -= normal.y * -1.71;
+            r1.x -= Math.round(normal.x * 1.0);
+            r1.y -= Math.round(normal.y * 1.0);
+            r2.x -= Math.round(normal.x * -1.0);
+            r2.y -= Math.round(normal.y * -1.0);
 
          }
         }
@@ -206,11 +208,19 @@ function drawRoom( room ) {
 }
 
 function snapToGrip (val, gridSize) {
-  var snap_candidate = gridSize * Math.round(val / gridSize);
-  if (Math.abs(val - snap_candidate) < 2) {
-    return snap_candidate;
-  }
-  else {
-    return null;
+  Math.round(val / gridSize) * gridSize;
+};
+
+function drawGrid() {
+  var
+    r = 100;
+  cz1.fS = '#ccc';
+  for (var i = -r; i < r; i++) {
+    for (var j = -r; j < r; j++) {
+      cz1.ctx.beginPath();
+      cz1.ctx.rect(i * gV.grid, j * gV.grid, 1, 1);
+      cz1.ctx.closePath();
+      cz1.ctx.fill();
+    }
   }
 };
