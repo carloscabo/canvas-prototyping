@@ -6,7 +6,7 @@
 var gV = {
   radius: 768 / 2,
 
-  room_number: 90,
+  room_number: 60,
   max_room_w: 14,
   min_room_w: 2,
   max_room_h: 16,
@@ -19,9 +19,14 @@ var gV = {
 
   average_area: 0,
 
+  // Areas over the average by this factor
+  // Define the main rooms of the dungeos
+  average_area_limit: 1.45,
+
   overlapping: true
 },
 rooms = [],
+main_rooms = [],
 cz1;
 
 $(document).ready(function() {
@@ -77,6 +82,14 @@ $(document).ready(function() {
     // Not iot realli the average
     gV.average_area = gV.average_area / gV.room_number;
 
+    for (var i = 0, len = rooms.length; i < len; i++) {
+      var
+        room = rooms[i];
+      if (room.area > gV.average_area * gV.average_area_limit) {
+        main_rooms.push( room );
+      }
+    }
+
     // console.log( rooms );
   };
 
@@ -116,12 +129,12 @@ $(document).ready(function() {
             midpoint.x = (r1.x + r2.x) / 2;
             midpoint.y = (r1.y + r2.y) / 2;
 
-            r1.x -= normal.x;
-            r1.y -= normal.y * 0.15;
-            r2.x -= normal.x * -1;
-            r2.y -= normal.y * -1 * 0.15;
-          }
+            r1.x -= normal.x * 1.0;
+            r1.y -= normal.y * 0.71;
+            r2.x -= normal.x * -1.01;
+            r2.y -= normal.y * -1.71;
 
+         }
         }
       }
     }
@@ -169,19 +182,35 @@ function getRandomPointInEllipse(x, y, ellipse_w, ellipse_h ) {
   } else {
     r = u;
   }
-  return [ x + ( ellipse_w * r * Math.cos(t) ), y + ( ellipse_h * r * Math.sin(t) ) ];
+  return [
+    roundm( x + ( ellipse_w * r * Math.cos(t) ), gV.grid ),
+    roundm( y + ( ellipse_h * r * Math.sin(t) ), gV.grid )
+  ];
 }
 
+
+function roundm( n, m ) {
+  return Math.floor( ( ( n + m - 1 ) / m ) ) * m
+}
 
 function drawRoom( room ) {
   cz1.lW = '1px';
   cz1.fS = 'rgba(45, 93, 180, 0.75)';
   cz1.sS = '#fff';
 
-  if  ( room.area > gV.average_area * 1.35 ) {
+  if  ( room.area > gV.average_area * gV.average_area_limit ) {
     cz1.fS = 'rgba(180, 93, 45, 0.75)';
   }
   cz1.rect(room.x, room.y, room.w * gV.grid, room.h * gV.grid );
   cz1.ctx.fill();
 }
 
+function snapToGrip (val, gridSize) {
+  var snap_candidate = gridSize * Math.round(val / gridSize);
+  if (Math.abs(val - snap_candidate) < 2) {
+    return snap_candidate;
+  }
+  else {
+    return null;
+  }
+};
