@@ -12,7 +12,7 @@ var gV = {
   max_room_h: 16,
   min_room_h: 2,
 
-  grid: 16, // Pixels
+  grid: 12, // Pixels
 
   x: 0,
   y: 0,
@@ -184,10 +184,15 @@ function getRandomPointInEllipse(x, y, ellipse_w, ellipse_h ) {
   } else {
     r = u;
   }
-  return [
-    roundm( x + ( ellipse_w * r * Math.cos(t) ), gV.grid ),
-    roundm( y + ( ellipse_h * r * Math.sin(t) ), gV.grid )
-  ];
+
+  var
+    _x = x + (ellipse_w * r * Math.cos(t) ),
+    _y = y + (ellipse_h * r * Math.sin(t) );
+
+  _x = snapToGrip( _x, gV.grid );
+  _y = snapToGrip( _y, gV.grid );
+
+  return [ _x, _y ];
 }
 
 function roundm( n, m ) {
@@ -210,7 +215,7 @@ function drawRoom( room ) {
 }
 
 function snapToGrip (val, gridSize) {
-  Math.round(val / gridSize) * gridSize;
+  return Math.round(val / gridSize) * gridSize;
 };
 
 function drawGrid() {
