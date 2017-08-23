@@ -23,7 +23,7 @@ var gV = {
   max_room_h: 16,
   min_room_h: 2,
 
-  grid: 10, // Pixels
+  grid: 8, // Pixels
 
   x: 0,
   y: 0,
@@ -83,7 +83,7 @@ $(document).ready(function() {
           'y': p1[1],
           'w': gV.min_room_w + Math.round(Math.random() * (gV.max_room_w - gV.min_room_w)),
           'h': gV.min_room_h + Math.round(Math.random() * (gV.max_room_h - gV.min_room_h)),
-          'id': Math.random().toString(36).substr(2, 5)
+          'id': Math.random().toString(36).substr(2, 8)
         };
 
       room.area = room.w * room.h;
@@ -135,7 +135,7 @@ $(document).ready(function() {
 });
 
 
-function roomOverlapping ( r1, r2 ) {
+function roomsOverlap ( r1, r2 ) {
   var
     r2_l = r2.x,
     r2_r = r2.x + r2.w * gV.grid,
@@ -236,7 +236,7 @@ function spaceRooms ( rooms ) {
           r2 = rooms[j];
 
         // If rooms overlap
-        if ( roomOverlapping(r1, r2) ) {
+        if ( roomsOverlap(r1, r2) ) {
 
           rooms_overlapping = true;
           // console.log( 'overlaps' );
@@ -247,15 +247,21 @@ function spaceRooms ( rooms ) {
             normal = {},
             midpoint = {};
 
-          normal.x = dx / d;
-          normal.y = dy / d;
+          if ( d === 0 ) {
+            normal.x = 0;
+            normal.y = 0;
+          } else {
+            normal.x = dx / d;
+            normal.y = dy / d;
+          }
           midpoint.x = (r1.x + r2.x) / 2;
           midpoint.y = (r1.y + r2.y) / 2;
 
-          r1.x -= snapToGrid( normal.x * gV.grid, gV.grid );
-          r1.y -= snapToGrid( normal.y * gV.grid, gV.grid );
           r2.x -= snapToGrid( normal.x * -gV.grid, gV.grid );
           r2.y -= snapToGrid( normal.y * -gV.grid, gV.grid );
+          r1.x -= snapToGrid( normal.x * gV.grid , gV.grid );
+          r1.y -= snapToGrid( normal.y * gV.grid , gV.grid );
+
         }
       }
     }
@@ -276,7 +282,7 @@ function anyRoomOverlaps ( rooms ) {
         var
           r2 = rooms[j];
         // If rooms overlap
-        if (roomOverlapping(r1, r2)) {
+        if (roomsOverlap(r1, r2)) {
           rooms_overlapping = true;
         }
       }
