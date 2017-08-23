@@ -15,7 +15,7 @@ function wrap(fn){
 
 /* Global vars */
 var gV = {
-  radius: 215/ 2,
+  radius: 512/ 2,
 
   room_number: 20,
   max_room_w: 16,
@@ -77,13 +77,14 @@ $(document).ready(function() {
     for (var i = 0; i < gV.room_number; i++) {
       var
         // p1 = getRandomPointInEllipse (0, 0, gV.radius / 2, gV.radius / 2);
-        p1 = getRandomPointInEllipse(0, 0, 128, 128),
+        p1 = getRandomPointInEllipse(0, 0, 64, 64),
         room = {
           'x': p1[0],
           'y': p1[1],
           'w': gV.min_room_w + Math.round(Math.random() * (gV.max_room_w - gV.min_room_w)),
           'h': gV.min_room_h + Math.round(Math.random() * (gV.max_room_h - gV.min_room_h)),
-          'id': Math.random().toString(36).substr(2, 8)
+          'id': Math.random().toString(36).substr(2, 8),
+          'idx': i
         };
 
       room.area = room.w * room.h;
@@ -146,10 +147,17 @@ function roomsOverlap ( r1, r2 ) {
     r1_t = r1.y,
     r1_b = r1.y + r1.h * gV.grid;
 
-  return !(r2_l > r1_r ||
+
+    var x1 = Math.max( r1_l, r2_l );
+    var x2 = Math.min( r1_r, r2_r );
+    var y1 = Math.max( r1_t, r2_t );
+    var y2 = Math.min( r1_b, r2_b );
+    return x1 < x2 && y1 < y2;
+
+  /* return !(r2_l > r1_r ||
     r2_r < r1_l ||
     r2_t > r1_b ||
-    r2_b < r1_t);
+    r2_b <= r1_t); */
 }
 
 function getRandomPointInEllipse(x, y, ellipse_w, ellipse_h ) {
@@ -174,7 +182,7 @@ function getRandomPointInEllipse(x, y, ellipse_w, ellipse_h ) {
 }
 
 function drawRoom( room ) {
-  cz1.lW = '1px';
+  cz1.lW = '1';
   cz1.fS = 'rgba(45, 93, 180, 0.75)';
   cz1.sS = '#fff';
 
@@ -186,6 +194,12 @@ function drawRoom( room ) {
   cz1.ctx.rect( room.x, room.y, room.w * gV.grid, room.h * gV.grid );
   cz1.ctx.closePath();
   cz1.ctx.fill();
+  cz1.ctx.stroke();
+
+  cz1.fS = '#ffffff';
+  cz1.ctx.font = "400 12px Hack";
+  cz1.ctx.textAlign = "left";
+  cz1.ctx.fillText( room.idx, room.x + 4, room.y + 18);
 }
 
 function snapToGrid ( val, gridSize ) {
@@ -209,7 +223,7 @@ function snapToGrid ( val, gridSize ) {
 function drawGrid() {
   var
     r = 100;
-  cz1.fS = '#ccc';
+  cz1.fS = '#aaa';
   for (var i = -r; i < r; i++) {
     for (var j = -r; j < r; j++) {
       cz1.ctx.beginPath();
@@ -257,10 +271,15 @@ function spaceRooms ( rooms ) {
           midpoint.x = (r1.x + r2.x) / 2;
           midpoint.y = (r1.y + r2.y) / 2;
 
-          r2.x -= snapToGrid( normal.x * -gV.grid, gV.grid );
-          r2.y -= snapToGrid( normal.y * -gV.grid, gV.grid );
-          r1.x -= snapToGrid( normal.x * gV.grid , gV.grid );
-          r1.y -= snapToGrid( normal.y * gV.grid , gV.grid );
+          r2.x += snapToGrid( normal.x * gV.grid * 1.0, gV.grid );
+          r2.y += snapToGrid( normal.y * gV.grid * 1.0, gV.grid );
+          r1.x -= snapToGrid( normal.x * gV.grid * 1.0, gV.grid );
+          r1.y -= snapToGrid( normal.y * gV.grid * 1.0, gV.grid );
+
+          // r2.x += normal.x * 1.0;
+          // r2.y += normal.y * 1.0;
+          // r1.x -= normal.x * 1.0;
+          // r1.y -= normal.y * 1.0;
 
         }
       }
