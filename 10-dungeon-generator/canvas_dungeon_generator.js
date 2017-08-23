@@ -82,7 +82,8 @@ $(document).ready(function() {
           'x': p1[0],
           'y': p1[1],
           'w': gV.min_room_w + Math.round(Math.random() * (gV.max_room_w - gV.min_room_w)),
-          'h': gV.min_room_h + Math.round(Math.random() * (gV.max_room_h - gV.min_room_h))
+          'h': gV.min_room_h + Math.round(Math.random() * (gV.max_room_h - gV.min_room_h)),
+          'id': Math.random().toString(36).substr(2, 5)
         };
 
       room.area = room.w * room.h;
@@ -244,13 +245,12 @@ function spaceRooms ( rooms ) {
             dx = r2.x - r1.x,
             dy = r2.y - r1.y,
             normal = {},
-            vector = {},
             midpoint = {};
 
           normal.x = dx / d;
           normal.y = dy / d;
-          // midpoint.x = (r1.x + r2.x) / 2;
-          // midpoint.y = (r1.y + r2.y) / 2;
+          midpoint.x = (r1.x + r2.x) / 2;
+          midpoint.y = (r1.y + r2.y) / 2;
 
           r1.x -= snapToGrid( normal.x * gV.grid, gV.grid );
           r1.y -= snapToGrid( normal.y * gV.grid, gV.grid );
