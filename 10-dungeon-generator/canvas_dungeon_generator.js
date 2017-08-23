@@ -6,13 +6,13 @@
 var gV = {
   radius: 768 / 2,
 
-  room_number: 20,
-  max_room_w: 10,
+  room_number: 30,
+  max_room_w: 16,
   min_room_w: 2,
   max_room_h: 16,
   min_room_h: 2,
 
-  grid: 12, // Pixels
+  grid: 8, // Pixels
 
   x: 0,
   y: 0,
@@ -106,40 +106,7 @@ $(document).ready(function() {
 
     drawGrid();
 
-    // Move to avoid overlap
-    for (var i = 0, len = rooms.length; i < len; i++) {
-      var
-        r1 = rooms[i];
-      for (var j = 0; j < len; j++) {
-        if (i !== j) {
-          var
-            r2 = rooms[j];
-
-          // If rooms overlap
-          if ( gV.overlapping && roomOverlapping(r1, r2) ) {
-            // console.log( 'overlaps' );
-            var
-              d = utilz.dist( r1.x, r1.y, r2.x, r2.y),
-              dx = r2.x - r1.x,
-              dy = r2.y - r1.y,
-              normal = {},
-              vector = {},
-              midpoint = {};
-
-            normal.x = dx / d;
-            normal.y = dy / d;
-            midpoint.x = (r1.x + r2.x) / 2;
-            midpoint.y = (r1.y + r2.y) / 2;
-
-            r1.x -= Math.round(normal.x * 1.0);
-            r1.y -= Math.round(normal.y * 1.0);
-            r2.x -= Math.round(normal.x * -1.0);
-            r2.y -= Math.round(normal.y * -1.0);
-
-         }
-        }
-      }
-    }
+    spaceRooms( rooms );
 
     // Draw all rooms
     for (var i = 0, len = rooms.length; i < len; i++) {
@@ -173,7 +140,6 @@ function roomOverlapping ( r1, r2 ) {
     r2_b < r1_t);
 }
 
-
 function getRandomPointInEllipse(x, y, ellipse_w, ellipse_h ) {
   var
     t = 2 * Math.PI * Math.random(),
@@ -186,17 +152,13 @@ function getRandomPointInEllipse(x, y, ellipse_w, ellipse_h ) {
   }
 
   var
-    _x = x + (ellipse_w * r * Math.cos(t) ),
-    _y = y + (ellipse_h * r * Math.sin(t) );
+    _x = x + ( ellipse_w * r * Math.cos(t) ),
+    _y = y + ( ellipse_h * r * Math.sin(t) );
 
-  _x = snapToGrip( _x, gV.grid );
-  _y = snapToGrip( _y, gV.grid );
+  _x = snapToGrid( _x, gV.grid );
+  _y = snapToGrid( _y, gV.grid );
 
   return [ _x, _y ];
-}
-
-function roundm( n, m ) {
-  return Math.floor( ( ( n + m - 1 ) / m ) ) * m
 }
 
 function drawRoom( room ) {
@@ -214,9 +176,23 @@ function drawRoom( room ) {
   cz1.ctx.fill();
 }
 
-function snapToGrip (val, gridSize) {
+function snapToGrid ( val, gridSize ) {
   return Math.round(val / gridSize) * gridSize;
 };
+
+// function snapAllToGrid( rooms, gridSize) {
+//   for (var i = 0, len = rooms.length; i < len; i++) {
+//     rooms[i].x = snapToGrid(rooms[i].x, gridSize);
+//     rooms[i].y = snapToGrid(rooms[i].y, gridSize);
+//   }
+
+//   if ( anyRoomOverlaps(rooms) ) {
+//     console.log('Overlapps!');
+//   } else {
+//     console.log( 'No overlapping!' );
+//   }
+
+// };
 
 function drawGrid() {
   var
@@ -231,3 +207,69 @@ function drawGrid() {
     }
   }
 };
+
+function spaceRooms ( rooms ) {
+  // Move to avoid overlap
+  var
+    rooms_overlapping = false;
+
+  for (var i = 0, len = rooms.length; i < len; i++) {
+    var
+      r1 = rooms[i];
+    r1.x = Math.round(r1.x);
+    r1.y = Math.round(r1.y);
+    for (var j = 0; j < len; j++) {
+      if (i !== j) {
+        var
+          r2 = rooms[j];
+
+        // If rooms overlap
+        if ( roomOverlapping(r1, r2) ) {
+
+          rooms_overlapping = true;
+          // console.log( 'overlaps' );
+          var
+            d = utilz.dist(r1.x, r1.y, r2.x, r2.y),
+            dx = r2.x - r1.x,
+            dy = r2.y - r1.y,
+            normal = {},
+            vector = {},
+            midpoint = {};
+
+          normal.x = dx / d;
+          normal.y = dy / d;
+          midpoint.x = (r1.x + r2.x) / 2;
+          midpoint.y = (r1.y + r2.y) / 2;
+
+          //r1.x -= normal.x * 0.9;
+          //r1.y -= normal.y * 0.9;
+          r2.x -= snapToGrid( normal.x * -gV.grid, gV.grid );
+          r2.y -= snapToGrid( normal.y * -gV.grid, gV.grid );
+        }
+      }
+    }
+  }
+}
+
+
+function anyRoomOverlaps ( rooms ) {
+  // Move to avoid overlap
+  var
+    rooms_overlapping = false;
+
+  for (var i = 0, len = rooms.length; i < len; i++) {
+    var
+      r1 = rooms[i];
+    for (var j = 0; j < len; j++) {
+      if (i !== j) {
+        var
+          r2 = rooms[j];
+        // If rooms overlap
+        if (roomOverlapping(r1, r2)) {
+          rooms_overlapping = true;
+        }
+      }
+    }
+  }
+  return rooms_overlapping;
+}
