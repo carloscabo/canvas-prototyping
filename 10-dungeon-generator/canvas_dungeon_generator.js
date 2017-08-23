@@ -1,18 +1,29 @@
 // http://www.gamasutra.com/blogs/AAdonaac/20150903/252889/Procedural_Dungeon_Generation_Algorithm.php
 
-'use strict';
+// 'use strict';
+
+for(var n in Object.getOwnPropertyNames(Math)){
+  if (typeof Math[n] === 'function') Math[n] = wrap(Math[n]);
+}
+function wrap(fn){
+  return function(){
+      var res = fn.apply(this, arguments);
+      if (isNaN(res)) debugger; //throw new Error('NaN found!')/*or
+      return res;
+  };
+}
 
 /* Global vars */
 var gV = {
-  radius: 768 / 2,
+  radius: 215/ 2,
 
-  room_number: 30,
+  room_number: 20,
   max_room_w: 16,
   min_room_w: 2,
   max_room_h: 16,
   min_room_h: 2,
 
-  grid: 8, // Pixels
+  grid: 10, // Pixels
 
   x: 0,
   y: 0,
@@ -34,7 +45,7 @@ $(document).ready(function() {
 
   // Inicializamos el canvas
   cz1 = new Canvaz('#cnvz');
-  cz1.fullScreen();
+  // cz1.fullScreen();
 
   // HSL
   var palette = [
@@ -66,12 +77,12 @@ $(document).ready(function() {
     for (var i = 0; i < gV.room_number; i++) {
       var
         // p1 = getRandomPointInEllipse (0, 0, gV.radius / 2, gV.radius / 2);
-        p1 = getRandomPointInEllipse(0, 0, gV.radius / 8, gV.radius / 8),
+        p1 = getRandomPointInEllipse(0, 0, 128, 128),
         room = {
-          x: p1[0],
-          y: p1[1],
-          w: gV.min_room_w + Math.floor(Math.random() * (gV.max_room_w - gV.min_room_w)),
-          h: gV.min_room_h + Math.floor(Math.random() * (gV.max_room_h - gV.min_room_h))
+          'x': p1[0],
+          'y': p1[1],
+          'w': gV.min_room_w + Math.round(Math.random() * (gV.max_room_w - gV.min_room_w)),
+          'h': gV.min_room_h + Math.round(Math.random() * (gV.max_room_h - gV.min_room_h))
         };
 
       room.area = room.w * room.h;
@@ -82,15 +93,15 @@ $(document).ready(function() {
     // Not iot realli the average
     gV.average_area = gV.average_area / gV.room_number;
 
-    for (var i = 0, len = rooms.length; i < len; i++) {
+    for (var j = 0, len = rooms.length; j < len; j++) {
       var
-        room = rooms[i];
+        room = rooms[j];
       if (room.area > gV.average_area * gV.average_area_limit) {
         main_rooms.push( room );
       }
     }
 
-    // console.log( rooms );
+    console.log( rooms );
   };
 
   // ----------------------------------
@@ -241,10 +252,12 @@ function spaceRooms ( rooms ) {
           midpoint.x = (r1.x + r2.x) / 2;
           midpoint.y = (r1.y + r2.y) / 2;
 
-          //r1.x -= normal.x * 0.9;
-          //r1.y -= normal.y * 0.9;
-          r2.x -= snapToGrid( normal.x * -gV.grid, gV.grid );
-          r2.y -= snapToGrid( normal.y * -gV.grid, gV.grid );
+          r1.x -= snapToGrid( normal.x * gV.grid, gV.grid );
+          r1.y -= snapToGrid( normal.y * gV.grid, gV.grid );
+
+          // debugger;
+          //r2.x -= snapToGrid( normal.x * -gV.grid, gV.grid );
+          //r2.y -= snapToGrid( normal.y * -gV.grid, gV.grid );
         }
       }
     }
@@ -273,3 +286,4 @@ function anyRoomOverlaps ( rooms ) {
   }
   return rooms_overlapping;
 }
+
