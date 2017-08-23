@@ -249,15 +249,13 @@ function spaceRooms ( rooms ) {
 
           normal.x = dx / d;
           normal.y = dy / d;
-          midpoint.x = (r1.x + r2.x) / 2;
-          midpoint.y = (r1.y + r2.y) / 2;
+          // midpoint.x = (r1.x + r2.x) / 2;
+          // midpoint.y = (r1.y + r2.y) / 2;
 
           r1.x -= snapToGrid( normal.x * gV.grid, gV.grid );
           r1.y -= snapToGrid( normal.y * gV.grid, gV.grid );
-
-          // debugger;
-          //r2.x -= snapToGrid( normal.x * -gV.grid, gV.grid );
-          //r2.y -= snapToGrid( normal.y * -gV.grid, gV.grid );
+          r2.x -= snapToGrid( normal.x * -gV.grid, gV.grid );
+          r2.y -= snapToGrid( normal.y * -gV.grid, gV.grid );
         }
       }
     }
