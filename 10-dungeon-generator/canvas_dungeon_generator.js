@@ -77,7 +77,7 @@ $(document).ready(function() {
     for (var i = 0; i < gV.room_number; i++) {
       var
         // p1 = getRandomPointInEllipse (0, 0, gV.radius / 2, gV.radius / 2);
-        p1 = getRandomPointInEllipse(0, 0, 256, 256),
+        p1 = getRandomPointInEllipse(0, 0, 128, 128),
         room = {
           'x': p1[0],
           'y': p1[1],
@@ -86,6 +86,9 @@ $(document).ready(function() {
           'id': Math.random().toString(36).substr(2, 8),
           'idx': i
         };
+
+      room.cx = room.x + ( room.w / 2 * gV.grid );
+      room.cy = room.y + ( room.h / 2 * gV.grid );
 
       room.area = room.w * room.h;
       gV.average_area += room.area;
@@ -128,6 +131,7 @@ $(document).ready(function() {
       drawRoom( room );
     }
 
+    drawCoord();
 
   };
 
@@ -197,9 +201,13 @@ function drawRoom( room ) {
   cz1.ctx.stroke();
 
   cz1.fS = '#ffffff';
+  cz1.plot( room.cx, room.cy, 1.0 );
+  cz1.ctx.fill();
+
   cz1.ctx.font = "400 12px Hack";
   cz1.ctx.textAlign = "left";
   cz1.ctx.fillText( room.idx, room.x + 4, room.y + 18);
+
 }
 
 function snapToGrid ( val, gridSize ) {
@@ -232,6 +240,17 @@ function drawGrid() {
       cz1.ctx.fill();
     }
   }
+};
+
+function drawCoord() {
+  cz1.fS = '#f00';
+  cz1.ctx.beginPath();
+
+  cz1.ctx.rect( 0, - cz1.h, 1, cz1.h * 2);
+  cz1.ctx.rect( - cz1.w, 0, cz1.w * 2, 1);
+  cz1.ctx.closePath();
+  cz1.ctx.fill();
+  // debugger;
 };
 
 function spaceRooms ( rooms ) {
@@ -275,6 +294,11 @@ function spaceRooms ( rooms ) {
           r2.y += snapToGrid( normal.y * gV.grid * 1.0, gV.grid );
           r1.x -= snapToGrid( normal.x * gV.grid * 1.0, gV.grid );
           r1.y -= snapToGrid( normal.y * gV.grid * 1.0, gV.grid );
+
+          r1.cx = r1.x + ( r1.w / 2 * gV.grid );
+          r1.cy = r1.y + ( r1.h / 2 * gV.grid );
+          r2.cx = r2.x + ( r2.w / 2 * gV.grid );
+          r2.cy = r2.y + ( r2.h / 2 * gV.grid );
 
           // r2.x += normal.x * 1.0;
           // r2.y += normal.y * 1.0;
