@@ -17,13 +17,13 @@ function wrap(fn){
 var gV = {
   radius: 512/ 2,
 
-  room_number: 20,
+  room_number: 200,
   max_room_w: 16,
   min_room_w: 2,
   max_room_h: 16,
   min_room_h: 2,
 
-  grid: 8, // Pixels
+  grid: 4, // Pixels
 
   x: 0,
   y: 0,
@@ -77,7 +77,7 @@ $(document).ready(function() {
     for (var i = 0; i < gV.room_number; i++) {
       var
         // p1 = getRandomPointInEllipse (0, 0, gV.radius / 2, gV.radius / 2);
-        p1 = getRandomPointInEllipse(0, 0, 64, 64),
+        p1 = getRandomPointInEllipse(0, 0, 256, 256),
         room = {
           'x': p1[0],
           'y': p1[1],
