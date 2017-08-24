@@ -23,7 +23,7 @@ var gV = {
   max_room_h: 16,
   min_room_h: 2,
 
-  grid: 10, // Pixels
+  grid: 16, // Pixels
 
   x: 0,
   y: 0,
@@ -293,25 +293,20 @@ function spaceRooms ( rooms ) {
           midpoint.x = (r1.x + r2.x) / 2;
           midpoint.y = (r1.y + r2.y) / 2;
 
-          r2.cx += snapToGrid( normal.x * gV.grid * 1.0, gV.grid );
-          r2.cy += snapToGrid( normal.y * gV.grid * 1.0, gV.grid );
-          r1.cx -= snapToGrid( normal.x * gV.grid * 1.0, gV.grid );
-          r1.cy -= snapToGrid( normal.y * gV.grid * 1.0, gV.grid );
+          r2.cx += ( normal.x * gV.grid * 1.0 );
+          r2.cy += ( normal.y * gV.grid * 1.0 );
+          r1.cx -= ( normal.x * gV.grid * 1.0 );
+          r1.cy -= ( normal.y * gV.grid * 1.0 );
 
-          r2.x = r2.cx - r2.w / 2 * gV.grid;
-          r2.y = r2.cy - r2.h / 2 * gV.grid;
-          r1.x = r1.cx - r1.w / 2 * gV.grid;
-          r1.y = r1.cy - r1.h / 2 * gV.grid;
+          r2.x = snapToGrid( r2.cx - r2.w / 2 * gV.grid, gV.grid );
+          r2.y = snapToGrid( r2.cy - r2.h / 2 * gV.grid, gV.grid );
+          r1.x = snapToGrid( r1.cx - r1.w / 2 * gV.grid, gV.grid );
+          r1.y = snapToGrid( r1.cy - r1.h / 2 * gV.grid, gV.grid );
 
-          r1.cx = r1.x + ( r1.w / 2 * gV.grid );
-          r1.cy = r1.y + ( r1.h / 2 * gV.grid );
-          r2.cx = r2.x + ( r2.w / 2 * gV.grid );
-          r2.cy = r2.y + ( r2.h / 2 * gV.grid );
-
-          // r2.x += normal.x * 1.0;
-          // r2.y += normal.y * 1.0;
-          // r1.x -= normal.x * 1.0;
-          // r1.y -= normal.y * 1.0;
+          r2.cx = r2.x + ( r2.w * gV.grid / 2 );
+          r2.cy = r2.y + ( r2.h * gV.grid / 2 );
+          r1.cx = r1.x + ( r1.w * gV.grid / 2 );
+          r1.cy = r1.y + ( r1.h * gV.grid / 2 );
 
         }
       }
