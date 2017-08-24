@@ -17,13 +17,13 @@ function wrap(fn){
 var gV = {
   radius: 512/ 2,
 
-  room_number: 200,
+  room_number: 20,
   max_room_w: 16,
   min_room_w: 2,
   max_room_h: 16,
   min_room_h: 2,
 
-  grid: 4, // Pixels
+  grid: 10, // Pixels
 
   x: 0,
   y: 0,
@@ -45,7 +45,7 @@ $(document).ready(function() {
 
   // Inicializamos el canvas
   cz1 = new Canvaz('#cnvz');
-  // cz1.fullScreen();
+  cz1.fullScreen();
 
   // HSL
   var palette = [
@@ -77,7 +77,7 @@ $(document).ready(function() {
     for (var i = 0; i < gV.room_number; i++) {
       var
         // p1 = getRandomPointInEllipse (0, 0, gV.radius / 2, gV.radius / 2);
-        p1 = getRandomPointInEllipse(0, 0, 128, 128),
+        p1 = getRandomPointInEllipse(0, 0, 64, 64),
         room = {
           'x': p1[0],
           'y': p1[1],
@@ -86,6 +86,9 @@ $(document).ready(function() {
           'id': Math.random().toString(36).substr(2, 8),
           'idx': i
         };
+
+      room.x -= ( room.w );
+      room.y -= ( room.h );
 
       room.cx = room.x + ( room.w / 2 * gV.grid );
       room.cy = room.y + ( room.h / 2 * gV.grid );
@@ -274,9 +277,9 @@ function spaceRooms ( rooms ) {
           rooms_overlapping = true;
           // console.log( 'overlaps' );
           var
-            d = utilz.dist(r1.x, r1.y, r2.x, r2.y),
-            dx = r2.x - r1.x,
-            dy = r2.y - r1.y,
+            d = utilz.dist(r1.cx, r1.cy, r2.cx, r2.cy),
+            dx = r2.cx - r1.cx,
+            dy = r2.cy - r1.cy,
             normal = {},
             midpoint = {};
 
@@ -290,10 +293,15 @@ function spaceRooms ( rooms ) {
           midpoint.x = (r1.x + r2.x) / 2;
           midpoint.y = (r1.y + r2.y) / 2;
 
-          r2.x += snapToGrid( normal.x * gV.grid * 1.0, gV.grid );
-          r2.y += snapToGrid( normal.y * gV.grid * 1.0, gV.grid );
-          r1.x -= snapToGrid( normal.x * gV.grid * 1.0, gV.grid );
-          r1.y -= snapToGrid( normal.y * gV.grid * 1.0, gV.grid );
+          r2.cx += snapToGrid( normal.x * gV.grid * 1.0, gV.grid );
+          r2.cy += snapToGrid( normal.y * gV.grid * 1.0, gV.grid );
+          r1.cx -= snapToGrid( normal.x * gV.grid * 1.0, gV.grid );
+          r1.cy -= snapToGrid( normal.y * gV.grid * 1.0, gV.grid );
+
+          r2.x = r2.cx - r2.w / 2 * gV.grid;
+          r2.y = r2.cy - r2.h / 2 * gV.grid;
+          r1.x = r1.cx - r1.w / 2 * gV.grid;
+          r1.y = r1.cy - r1.h / 2 * gV.grid;
 
           r1.cx = r1.x + ( r1.w / 2 * gV.grid );
           r1.cy = r1.y + ( r1.h / 2 * gV.grid );
