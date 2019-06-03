@@ -2,8 +2,8 @@
 
 /* Global vars */
 var gV = {
-  radius: 4,
-  space: 64,
+  radius: 2,
+  space: 8,
   circles_per_half_line: -1,
   num_vertical_lines: 0,
   circle_lines_dx: 0,
